@@ -35,7 +35,7 @@ public class Principal {
                         new MenuEpisodios().menu();
                         break;
                     case 3:
-                        new MenuAtor().menu(); // Ignorar por enquanto
+                        new MenuAtor().menu(); 
                         break;
                     case 4:
                         break;

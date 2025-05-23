@@ -1,4 +1,5 @@
 package aed3;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -6,7 +7,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class ParIDEndereco implements RegistroHashExtensivel {
-    
+
     private int id;           // chave
     private long endereco;    // valor
     private final short TAMANHO = 12;  // tamanho em bytes
@@ -39,7 +40,7 @@ public class ParIDEndereco implements RegistroHashExtensivel {
     }
 
     public String toString() {
-        return "("+this.id + ";" + this.endereco+")";
+        return "(" + this.id + ";" + this.endereco + ")";
     }
 
     public byte[] toByteArray() throws IOException {
