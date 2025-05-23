@@ -11,7 +11,7 @@ public class ParNomeEpisodioID implements RegistroHashExtensivel {
     private String nome;
     private int id;
     private short tamanho = 34;
-    private final short nomeTamanho = 30; 
+    private final short nomeTamanho = 30;
 
     public ParNomeEpisodioID() {
         nome = "";
@@ -44,8 +44,6 @@ public class ParNomeEpisodioID implements RegistroHashExtensivel {
         return "(" + this.nome + ";" + this.id + ")";
     }
 
- 
-
     public byte[] toByteArray() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
@@ -70,7 +68,7 @@ public class ParNomeEpisodioID implements RegistroHashExtensivel {
     }
 
     public void copyStringToByteArray(byte[] targetArray, String value) {
-        byte[] stringBytes = value.getBytes(); 
+        byte[] stringBytes = value.getBytes();
         int copyLength = Math.min(stringBytes.length, this.nomeTamanho);
 
         System.arraycopy(stringBytes, 0, targetArray, 0, copyLength);

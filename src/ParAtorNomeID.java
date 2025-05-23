@@ -1,3 +1,4 @@
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -43,8 +44,6 @@ public class ParAtorNomeID implements RegistroHashExtensivel {
         return "(" + this.nome + ";" + this.id + ")";
     }
 
- 
-
     public byte[] toByteArray() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
@@ -69,7 +68,7 @@ public class ParAtorNomeID implements RegistroHashExtensivel {
     }
 
     public void copyStringToByteArray(byte[] targetArray, String value) {
-        byte[] stringBytes = value.getBytes(); 
+        byte[] stringBytes = value.getBytes();
         int copyLength = Math.min(stringBytes.length, this.nomeTamanho);
 
         System.arraycopy(stringBytes, 0, targetArray, 0, copyLength);
@@ -78,5 +77,5 @@ public class ParAtorNomeID implements RegistroHashExtensivel {
             targetArray[i] = (byte) ' ';
         }
     }
-    
+
 }

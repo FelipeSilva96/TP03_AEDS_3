@@ -1,9 +1,11 @@
+
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class MenuAtor {
+
     String actorName;
-    ArquivoSerie arqSerie; 
+    ArquivoSerie arqSerie;
     ArquivoAtor arqAtor;
     private static Scanner scan = new Scanner(System.in);
 
@@ -215,18 +217,18 @@ public class MenuAtor {
 
         return res;
     }
-    
-    public void vinculoAtor(){
+
+    public void vinculoAtor() {
         System.out.print("\nNome do Ator: ");
         String nome = scan.nextLine();  // Lê o ID digitado pelo usuário
         // Limpar o buffer após o nextInt()
 
         if (nome != null) {
             try {
-                
+
                 ArrayList<Serie> lista_de_series = arqAtor.readSeries(nome);
-                if(lista_de_series!=null && !lista_de_series.isEmpty()){
-                    for(Serie i:lista_de_series){
+                if (lista_de_series != null && !lista_de_series.isEmpty()) {
+                    for (Serie i : lista_de_series) {
                         MenuSeries.mostraSerie(i);
                     }
                 } else {

@@ -17,7 +17,7 @@ public class Principal {
                 System.out.println("> Início");
                 System.out.println("\n1) Séries");
                 System.out.println("2) Episódios");
-                System.out.println("3) Atores"); // ignorar por enquanto
+                System.out.println("3) Atores"); 
                 System.out.println("4) Sair");
 
                 System.out.print("\nOpção: ");

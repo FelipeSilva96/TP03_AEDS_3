@@ -1,3 +1,4 @@
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -22,7 +23,7 @@ public class Serie implements EntidadeArquivo {
 
     }
 
-    public Serie (Serie s) {
+    public Serie(Serie s) {
         this.id = s.id;
         this.nome = new String(s.nome);
         this.anoLancamento = s.anoLancamento;
@@ -39,7 +40,7 @@ public class Serie implements EntidadeArquivo {
     }
 
     public Serie(int id, String nome, short anoLancamento, String sinopse, String streaming) {
-        
+
         this.id = id;
         this.nome = nome;
         this.anoLancamento = anoLancamento;
@@ -82,7 +83,7 @@ public class Serie implements EntidadeArquivo {
         dos.writeShort(this.anoLancamento);
         dos.writeUTF(this.sinopse);
         dos.writeUTF(this.streaming);
-        
+
         return baos.toByteArray();
     }
 

@@ -1,3 +1,4 @@
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -6,28 +7,29 @@ import java.io.IOException;
 
 import aed3.EntidadeArquivo;
 
-public class Ator implements EntidadeArquivo{
+public class Ator implements EntidadeArquivo {
+
     int id;
     String nome;
 
-    public Ator(){
-        this.id=-1;
-        this.nome="";
+    public Ator() {
+        this.id = -1;
+        this.nome = "";
     }
 
-    public Ator(int id, String nome){
-        this.id=id;
-        this.nome=new String(nome);
+    public Ator(int id, String nome) {
+        this.id = id;
+        this.nome = new String(nome);
     }
 
-    public Ator(Ator a){
-        this.id=a.id;
-        this.nome=new String(a.nome);
+    public Ator(Ator a) {
+        this.id = a.id;
+        this.nome = new String(a.nome);
     }
 
-    public Ator(String nome){
-        this.id=-1;
-        this.nome=new String(nome);
+    public Ator(String nome) {
+        this.id = -1;
+        this.nome = new String(nome);
     }
 
     @Override
@@ -80,6 +82,5 @@ public class Ator implements EntidadeArquivo{
         this.id = dis.readInt();
         this.nome = dis.readUTF();
     }
-    
-    
+
 }

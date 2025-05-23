@@ -1,3 +1,4 @@
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -5,16 +6,16 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import aed3.*;
 
-
 public class ParIDAtorIDSerie implements RegistroArvoreBMais<ParIDAtorIDSerie> {
+
     private int IDActor;
     private int IDSerie;
-    private short TAMANHO = 8; 
+    private short TAMANHO = 8;
 
     public int getIDSerie() {
         return this.IDSerie;
     }
- 
+
     public int getIDActor() {
         return this.IDActor;
     }
@@ -24,16 +25,16 @@ public class ParIDAtorIDSerie implements RegistroArvoreBMais<ParIDAtorIDSerie> {
         IDActor = -1;
     }
 
-    public ParIDAtorIDSerie( int idAtor,int idSerie) throws Exception {
+    public ParIDAtorIDSerie(int idAtor, int idSerie) throws Exception {
         this.IDActor = idAtor;
         this.IDSerie = idSerie;
-        
+
     }
 
     @Override
     public ParIDAtorIDSerie clone() {
         try {
-            return new ParIDAtorIDSerie( this.IDActor,this.IDSerie);
+            return new ParIDAtorIDSerie(this.IDActor, this.IDSerie);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -49,7 +50,7 @@ public class ParIDAtorIDSerie implements RegistroArvoreBMais<ParIDAtorIDSerie> {
     }
 
     public int compareTo(ParIDAtorIDSerie a) {
-        int id1 = this.IDActor; 
+        int id1 = this.IDActor;
         int id2 = a.IDActor;
 
         if (id1 == id2) {
@@ -77,5 +78,5 @@ public class ParIDAtorIDSerie implements RegistroArvoreBMais<ParIDAtorIDSerie> {
         this.IDSerie = dis.readInt();
         this.IDActor = dis.readInt();
     }
-    
+
 }

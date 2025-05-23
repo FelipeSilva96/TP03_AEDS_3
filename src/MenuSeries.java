@@ -1,12 +1,12 @@
 
-import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class MenuSeries {
 
     ArquivoSerie arqSeries;
     ArquivoEpisodio arqEpisodios;
-    ArquivoAtor arqAtor; 
+    ArquivoAtor arqAtor;
 
     private static Scanner scan = new Scanner(System.in);
 
@@ -85,7 +85,7 @@ public class MenuSeries {
         String nome = scan.nextLine();
         System.out.println("\nTemporada: ");
         int temporada = scan.nextInt();
-        scan.nextLine();  
+        scan.nextLine();
         Episodio ep;
 
         if (nome != null) {
@@ -333,7 +333,7 @@ public class MenuSeries {
                             ArrayList<Ator> list_ator = arqAtor.readAtores(serie.nome);
 
                             //excluir todos os vinculos da serie
-                            for(Ator i:list_ator){
+                            for (Ator i : list_ator) {
                                 arqAtor.unlinkAtorSerie(i.getID(), serie.getID());
                             }
 
@@ -360,21 +360,21 @@ public class MenuSeries {
         }
     }
 
-    public void vinculoSerie(){
+    public void vinculoSerie() {
         System.out.print("\nNome da Serie: ");
         String nome = scan.nextLine();  // Lê o ID digitado pelo usuário
         // Limpar o buffer após o nextInt()
 
         if (nome != null) {
             try {
-                
+
                 ArrayList<Ator> lista_de_atores = arqAtor.readAtores(nome);
-                if(lista_de_atores==null ){
+                if (lista_de_atores == null) {
                     System.out.println("Serie não encontrada.");
-                } else if(lista_de_atores.isEmpty()){
+                } else if (lista_de_atores.isEmpty()) {
                     System.out.println("Nenhum ator encontrado.");
-                }else{
-                    for(Ator i:lista_de_atores){
+                } else {
+                    for (Ator i : lista_de_atores) {
                         MenuAtor.mostrarAtor(i);
                     }
                 }
@@ -387,9 +387,9 @@ public class MenuSeries {
         }
     }
 
-    public void vincularAtores(){
+    public void vincularAtores() {
         System.out.print("\nNome da Serie: ");
-        String nome_ator="";
+        String nome_ator = "";
         String nome = scan.nextLine();  // Lê o ID digitado pelo usuário
 
         if (nome != null) {
@@ -397,28 +397,28 @@ public class MenuSeries {
 
                 Serie serie = arqSeries.read(nome);
 
-                if(serie!=null && serie.getID()>-1){
-                    while(!nome_ator.equals("0")){
+                if (serie != null && serie.getID() > -1) {
+                    while (!nome_ator.equals("0")) {
                         System.out.print("\nPara terminar as insercoes, digite 0 e pressione enter\n ");
-                        
+
                         System.out.print("\nNome do ator: ");
                         nome_ator = scan.nextLine().trim();
-                        if(!nome_ator.equals("0")){
-                            Ator ator=arqAtor.readNome(nome_ator);
-                            if(ator!=null && ator.getID()>-1){
-                                if(arqAtor.linkAtorSerie(ator.getID(), serie.getID())){
+                        if (!nome_ator.equals("0")) {
+                            Ator ator = arqAtor.readNome(nome_ator);
+                            if (ator != null && ator.getID() > -1) {
+                                if (arqAtor.linkAtorSerie(ator.getID(), serie.getID())) {
                                     System.out.println("Vinculo criado com sucesso");
-                                }else{
+                                } else {
                                     System.out.println("Criacao de vinculo falhou");
                                 }
-                            }else{
+                            } else {
                                 System.out.println("Ator nao encontrado.");
                             }
-                        }else{
+                        } else {
                             System.out.println("insercao encerrada");
                         }
                     }
-                }else{
+                } else {
                     System.out.println("Serie não encontrada.");
                 }
             } catch (Exception e) {
@@ -430,9 +430,9 @@ public class MenuSeries {
         }
     }
 
-    public void desvincularAtores(){
+    public void desvincularAtores() {
         System.out.print("\nNome da Serie: ");
-        String nome_ator="";
+        String nome_ator = "";
         String nome = scan.nextLine();  // Lê o ID digitado pelo usuário
 
         if (nome != null) {
@@ -440,28 +440,28 @@ public class MenuSeries {
 
                 Serie serie = arqSeries.read(nome);
 
-                if(serie!=null && serie.getID()>-1){
-                    while(!nome_ator.equals("0")){
+                if (serie != null && serie.getID() > -1) {
+                    while (!nome_ator.equals("0")) {
                         System.out.print("\nPara terminar, digite 0 e pressione enter\n ");
-                        
+
                         System.out.print("\nNome do ator: ");
                         nome_ator = scan.nextLine().trim();
-                        if(!nome_ator.equals("0")){
-                            Ator ator=arqAtor.readNome(nome_ator);
-                            if(ator!=null && ator.getID()>-1){
-                                if(arqAtor.unlinkAtorSerie(ator.getID(), serie.getID())){
+                        if (!nome_ator.equals("0")) {
+                            Ator ator = arqAtor.readNome(nome_ator);
+                            if (ator != null && ator.getID() > -1) {
+                                if (arqAtor.unlinkAtorSerie(ator.getID(), serie.getID())) {
                                     System.out.println("Vinculo excluido com sucesso");
-                                }else{
+                                } else {
                                     System.out.println("Exclusao de vinculo falhou");
                                 }
-                            }else{
+                            } else {
                                 System.out.println("Ator nao encontrado.");
                             }
-                        }else{
+                        } else {
                             System.out.println("Exclusao de vinculos encerrada");
                         }
                     }
-                }else{
+                } else {
                     System.out.println("Serie não encontrada.");
                 }
             } catch (Exception e) {

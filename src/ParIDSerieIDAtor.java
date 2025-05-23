@@ -1,3 +1,4 @@
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -5,14 +6,14 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import aed3.*;
 
-
 public class ParIDSerieIDAtor implements RegistroArvoreBMais<ParIDSerieIDAtor> {
+
     private int IDActor;
     private int IDSerie;
     private short TAMANHO = 8;
 
     public int getIDSerie() {
-        return this.IDSerie; 
+        return this.IDSerie;
     }
 
     public int getIDActor() {
@@ -76,5 +77,5 @@ public class ParIDSerieIDAtor implements RegistroArvoreBMais<ParIDSerieIDAtor> {
         this.IDSerie = dis.readInt();
         this.IDActor = dis.readInt();
     }
-    
+
 }
