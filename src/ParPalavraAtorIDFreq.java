@@ -3,9 +3,9 @@ package indices;
 import aed3.RegistroHashExtensivel;
 import java.io.*;
 
-
 public class ParPalavraAtorIDFreq implements RegistroHashExtensivel {
-    private static final int MAX_WORD_LENGTH = 50; // ajuste conforme necessário
+
+    private static final int MAX_WORD_LENGTH = 50;
     private String palavra;
     private int atorId;
     private int freq;
@@ -31,7 +31,7 @@ public class ParPalavraAtorIDFreq implements RegistroHashExtensivel {
     @Override
     public short size() {
         // 2 bytes per char (UTF-8) aproximado + 4 bytes int + 4 bytes int
-        return (short)(2 * MAX_WORD_LENGTH + Integer.BYTES * 2);
+        return (short) (2 * MAX_WORD_LENGTH + Integer.BYTES * 2);
     }
 
     @Override
@@ -54,8 +54,15 @@ public class ParPalavraAtorIDFreq implements RegistroHashExtensivel {
         this.freq = dis.readInt();
     }
 
-    // getters
-    public String getPalavra() { return palavra; }
-    public int getAtorId() { return atorId; }
-    public int getFreq() { return freq; }
+    public String getPalavra() {
+        return palavra;
+    }
+
+    public int getAtorId() {
+        return atorId;
+    }
+
+    public int getFreq() {
+        return freq;
+    }
 }

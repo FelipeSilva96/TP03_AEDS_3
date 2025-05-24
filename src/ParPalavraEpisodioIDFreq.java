@@ -4,6 +4,7 @@ import aed3.RegistroHashExtensivel;
 import java.io.*;
 
 public class ParPalavraEpisodioIDFreq implements RegistroHashExtensivel {
+
     private static final int MAX_WORD = 40;
     private String palavra;
     private int episodioId;
@@ -28,7 +29,7 @@ public class ParPalavraEpisodioIDFreq implements RegistroHashExtensivel {
 
     @Override
     public short size() {
-        return (short)(2 * MAX_WORD + Integer.BYTES * 2);
+        return (short) (2 * MAX_WORD + Integer.BYTES * 2);
     }
 
     @Override
@@ -49,7 +50,15 @@ public class ParPalavraEpisodioIDFreq implements RegistroHashExtensivel {
         this.freq = dis.readInt();
     }
 
-    public String getPalavra() { return palavra; }
-    public int getEpisodioId() { return episodioId; }
-    public int getFreq() { return freq; }
+    public String getPalavra() {
+        return palavra;
+    }
+
+    public int getEpisodioId() {
+        return episodioId;
+    }
+
+    public int getFreq() {
+        return freq;
+    }
 }
