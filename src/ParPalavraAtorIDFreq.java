@@ -1,5 +1,3 @@
-package indices;
-
 import aed3.RegistroHashExtensivel;
 import java.io.*;
 
