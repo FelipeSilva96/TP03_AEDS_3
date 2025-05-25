@@ -141,8 +141,8 @@ public class ArquivoSerie extends Arquivo<Serie> {
     public List<Serie> searchByTerm(String termo) throws Exception {
         List<Serie> resultado = new ArrayList<>();
         ParPalavraSerieIDFreq exemplo = new ParPalavraSerieIDFreq(termo, -1, -1);
-        List<ParPalavraSerieIDFreq> postings = indiceInversoSerie.read(exemplo.hashCode());
-        for (ParPalavraSerieIDFreq p : postings) {
+        ParPalavraSerieIDFreq p = indiceInversoSerie.read(exemplo.hashCode());
+        if (p != null) {
             resultado.add(read(p.getSerieId()));
         }
         return resultado;

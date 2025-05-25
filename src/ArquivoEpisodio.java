@@ -142,12 +142,13 @@ public class ArquivoEpisodio extends Arquivo<Episodio> {
     public List<Episodio> searchByTerm(String termo) throws Exception {
         List<Episodio> resultado = new ArrayList<>();
         ParPalavraEpisodioIDFreq exemplo = new ParPalavraEpisodioIDFreq(termo, -1, -1);
-        List<ParPalavraEpisodioIDFreq> postings = indiceInversoEpisodio.read(exemplo.hashCode());
-        for (ParPalavraEpisodioIDFreq p : postings) {
+        ParPalavraEpisodioIDFreq p = indiceInversoEpisodio.read(exemplo.hashCode());
+        if (p != null) {
             resultado.add(read(p.getEpisodioId()));
         }
         return resultado;
     }
+
 
     /*
     public boolean update(Episodio novoEpisodio, String antiga) throws Exception {

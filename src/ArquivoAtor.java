@@ -102,8 +102,9 @@ public class ArquivoAtor extends Arquivo<Ator> {
         }
         Map<String, Integer> oldFreqs = TextoUtils.termFrequencies(antigo.getNome());
         for (Map.Entry<String, Integer> e : oldFreqs.entrySet()) {
-            ParPalavraAtorIDFreq p = new ParPalavraAtorIDFreq(e.getKey(), antigo.getID(), e.getValue());
-            indiceInversoAtor.delete(p.hashCode());
+            String palavra = e.getKey();
+            int h = palavra.hashCode();
+            indiceInversoAtor.delete(h);
         }
         boolean ok = super.update(novo);
         if (!ok) {
@@ -117,17 +118,16 @@ public class ArquivoAtor extends Arquivo<Ator> {
         return true;
     }
 
- //   @Override
-
+    //   @Override
     public boolean delete(String nome) throws Exception {
         ParAtorNomeID pni = indiceIndiretoNomeAtor.read(ParAtorNomeID.hash(nome));
-        if (nome != null) {
+        if (pni != null) {
             if (delete(pni.getId())) {
                 return indiceIndiretoNomeAtor.delete(ParAtorNomeID.hash(nome));
             }
         }
-
         return false;
+
     }
 
     public boolean delete(int id) throws Exception {
@@ -138,8 +138,9 @@ public class ArquivoAtor extends Arquivo<Ator> {
         indiceIndiretoNomeAtor.delete(ParAtorNomeID.hash(at.getNome()));
         Map<String, Integer> freqs = TextoUtils.termFrequencies(at.getNome());
         for (Map.Entry<String, Integer> e : freqs.entrySet()) {
-            ParPalavraAtorIDFreq p = new ParPalavraAtorIDFreq(e.getKey(), id, e.getValue());
-            indiceInversoAtor.delete(p.hashCode());
+            String palavra = e.getKey();
+            int h = palavra.hashCode();
+            indiceInversoAtor.delete(h);
         }
         List<ParIDAtorIDSerie> links = indiceIndiretoAtorIDSerieID.read(new ParIDAtorIDSerie(id, -1));
         for (ParIDAtorIDSerie link : links) {
@@ -170,6 +171,7 @@ public class ArquivoAtor extends Arquivo<Ator> {
         return resultado;
     }
 
+    /*
     public List<Ator> searchByTerm(String termo) throws Exception {
         List<Ator> resultado = new ArrayList<>();
         ParPalavraAtorIDFreq exemplo = new ParPalavraAtorIDFreq(termo, -1, -1);
@@ -179,7 +181,7 @@ public class ArquivoAtor extends Arquivo<Ator> {
         }
         return resultado;
     }
-
+     */
     public boolean linkAtorSerie(int ator, int serie) throws Exception {
         boolean success = false;
 
@@ -219,18 +221,21 @@ public class ArquivoAtor extends Arquivo<Ator> {
         Ator aux = null;
 
         //recupera id do nomeSerie
-        ParNomeSerieID pni = arqSerie.indiceIndiretoNomeSerie.read(ParAtorNomeID.hash(nomeSerie));
+        Serie serie = arqSerie.read(nomeSerie);
+        if (serie == null) {
+            return null;
+        }
 
-        if (pni != null) {
-            ArrayList<ParIDSerieIDAtor> linkAtorSeries = indiceIndiretoSerieIDAtorID.read(new ParIDSerieIDAtor(pni.getId(), -1));
+        int serieId = serie.getID();
 
-            if (linkAtorSeries != null) {
-                for (ParIDSerieIDAtor i : linkAtorSeries) {
-                    System.out.println("\ninserido na lista\n");
-                    aux = new Ator(read(i.getIDActor()));
-                    lista_de_atores.add(aux);
-                }
+        ArrayList<ParIDSerieIDAtor> linkAtorSeries = indiceIndiretoSerieIDAtorID.read(new ParIDSerieIDAtor(serieId, -1));
+
+        if (linkAtorSeries != null) {
+            for (ParIDSerieIDAtor i : linkAtorSeries) {
+                aux = this.read(i.getIDActor());
+                lista_de_atores.add(aux);
             }
+
         }
 
         return lista_de_atores;
