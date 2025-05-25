@@ -1,5 +1,5 @@
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class MenuAtor {
@@ -161,7 +161,7 @@ public class MenuAtor {
                     char resp = scan.next().charAt(0);
                     if (resp == 'S' || resp == 's') {
                         // Salva as alterações no arquivo
-                        boolean alterado = arqAtor.update(ator, nome);
+                        boolean alterado = arqAtor.update(ator);
 
                         if (alterado) {
 
@@ -227,7 +227,7 @@ public class MenuAtor {
     public boolean hasSeries(String nome) throws Exception {
         boolean res = true;
 
-        ArrayList<Serie> lista = arqAtor.readSeries(nome);
+        List<Serie> lista = arqAtor.readSeries(nome);
 
         if (lista == null || lista.isEmpty()) {
             res = false;
@@ -244,7 +244,7 @@ public class MenuAtor {
         if (nome != null) {
             try {
 
-                ArrayList<Serie> lista_de_series = arqAtor.readSeries(nome);
+                List<Serie> lista_de_series = arqAtor.readSeries(nome);
                 if (lista_de_series != null && !lista_de_series.isEmpty()) {
                     for (Serie i : lista_de_series) {
                         MenuSeries.mostraSerie(i);

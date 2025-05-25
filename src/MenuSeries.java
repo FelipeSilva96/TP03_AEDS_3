@@ -1,5 +1,5 @@
 
-import java.util.ArrayList;
+import java.util.*;
 import java.util.Scanner;
 
 public class MenuSeries {
@@ -90,7 +90,7 @@ public class MenuSeries {
 
         if (nome != null) {
             try {
-                ArrayList<Episodio> series = arqEpisodios.readSerie(nome);  // Chama o método de leitura da classe Arquivo
+                List<Episodio> series = arqEpisodios.readSerie(nome);  // Chama o método de leitura da classe Arquivo
                 if (series != null) {
                     for (int i = 0; i < series.size(); i++) {
                         ep = series.get(i);
@@ -118,7 +118,7 @@ public class MenuSeries {
 
         if (nome != null) {
             try {
-                ArrayList<Episodio> series = arqEpisodios.readSerie(nome);  // Chama o método de leitura da classe Arquivo
+                List<Episodio> series = arqEpisodios.readSerie(nome);  // Chama o método de leitura da classe Arquivo
                 if (series != null) {
                     for (int i = 0; i < series.size(); i++) {
                         ep = series.get(i);
@@ -307,7 +307,7 @@ public class MenuSeries {
                     char resp = scan.next().charAt(0);
                     if (resp == 'S' || resp == 's') {
                         // Salva as alterações no arquivo
-                        boolean alterado = arqSeries.update(serie, nome);
+                        boolean alterado = arqSeries.update(serie);
 
                         if (alterado) {
 
@@ -349,7 +349,7 @@ public class MenuSeries {
                         char resp = scan.next().charAt(0);  // Lê a resposta do usuário
 
                         if (resp == 'S' || resp == 's') {
-                            ArrayList<Ator> list_ator = arqAtor.readAtores(serie.nome);
+                            List<Ator> list_ator = arqAtor.readAtores(serie.nome);
 
                             //excluir todos os vinculos da serie
                             for (Ator i : list_ator) {
@@ -387,7 +387,7 @@ public class MenuSeries {
         if (nome != null) {
             try {
 
-                ArrayList<Ator> lista_de_atores = arqAtor.readAtores(nome);
+                List<Ator> lista_de_atores = arqAtor.readAtores(nome);
                 if (lista_de_atores == null) {
                     System.out.println("Serie não encontrada.");
                 } else if (lista_de_atores.isEmpty()) {
@@ -495,7 +495,7 @@ public class MenuSeries {
     public boolean hasEpisodios(String nome) throws Exception {
         boolean res = true;
 
-        ArrayList<Episodio> lista = arqEpisodios.readSerie(nome);
+        List<Episodio> lista = arqEpisodios.readSerie(nome);
 
         if (lista == null) {
             res = false;

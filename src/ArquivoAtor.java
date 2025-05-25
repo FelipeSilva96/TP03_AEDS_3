@@ -38,35 +38,29 @@ public class ArquivoAtor extends Arquivo<Ator> {
 
     public List<Ator> searchTfIdf(String query) throws Exception {
         List<String> termos = TextoUtils.tokenize(query);
-        int N = this.count();  // total de atores
+        int N = this.count();
         Map<Integer, Double> scores = new HashMap<>();
 
         for (String termo : termos) {
-            ParPalavraAtorIDFreq exemplo = new ParPalavraAtorIDFreq(termo, -1, -1);
-            List<ParPalavraAtorIDFreq> postings = indiceInversoAtor.read(exemplo);
-            int DF = postings.size();
-            if (DF == 0) {
+            int h = termo.hashCode();
+            ParPalavraAtorIDFreq p = indiceInversoAtor.read(h);
+            if (p == null) {
                 continue;
             }
-            double idf = Math.log(N / (double) DF);
-
-            for (ParPalavraAtorIDFreq p : postings) {
-                double tfidf = p.getFreq() * idf;
-                scores.merge(p.getAtorId(), tfidf, Double::sum);
-            }
+            double idf = Math.log(N / 1.0);  // DF sempre =1 no HashExtensivel
+            double tfidf = p.getFreq() * idf;
+            scores.put(p.getAtorId(), tfidf);
         }
 
-        return scores.entrySet().stream()
-                .sorted(Map.Entry.<Integer, Double>comparingByValue(Comparator.reverseOrder()))
-                .map(e -> {
-                    try {
-                        return this.read(e.getKey());
-                    } catch (Exception ex) {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        // Ordena manualmente
+        List<Map.Entry<Integer, Double>> entries = new ArrayList<>(scores.entrySet());
+        entries.sort((a, b) -> Double.compare(b.getValue(), a.getValue()));
+
+        List<Ator> resultado = new ArrayList<>();
+        for (var e : entries) {
+            resultado.add(this.read(e.getKey()));
+        }
+        return resultado;
     }
 
     @Override
@@ -109,7 +103,7 @@ public class ArquivoAtor extends Arquivo<Ator> {
         Map<String, Integer> oldFreqs = TextoUtils.termFrequencies(antigo.getNome());
         for (Map.Entry<String, Integer> e : oldFreqs.entrySet()) {
             ParPalavraAtorIDFreq p = new ParPalavraAtorIDFreq(e.getKey(), antigo.getID(), e.getValue());
-            indiceInversoAtor.delete(p);
+            indiceInversoAtor.delete(p.hashCode());
         }
         boolean ok = super.update(novo);
         if (!ok) {
@@ -123,7 +117,7 @@ public class ArquivoAtor extends Arquivo<Ator> {
         return true;
     }
 
-    @Override
+ //   @Override
 
     public boolean delete(String nome) throws Exception {
         ParAtorNomeID pni = indiceIndiretoNomeAtor.read(ParAtorNomeID.hash(nome));
@@ -145,7 +139,7 @@ public class ArquivoAtor extends Arquivo<Ator> {
         Map<String, Integer> freqs = TextoUtils.termFrequencies(at.getNome());
         for (Map.Entry<String, Integer> e : freqs.entrySet()) {
             ParPalavraAtorIDFreq p = new ParPalavraAtorIDFreq(e.getKey(), id, e.getValue());
-            indiceInversoAtor.delete(p);
+            indiceInversoAtor.delete(p.hashCode());
         }
         List<ParIDAtorIDSerie> links = indiceIndiretoAtorIDSerieID.read(new ParIDAtorIDSerie(id, -1));
         for (ParIDAtorIDSerie link : links) {
@@ -179,7 +173,7 @@ public class ArquivoAtor extends Arquivo<Ator> {
     public List<Ator> searchByTerm(String termo) throws Exception {
         List<Ator> resultado = new ArrayList<>();
         ParPalavraAtorIDFreq exemplo = new ParPalavraAtorIDFreq(termo, -1, -1);
-        List<ParPalavraAtorIDFreq> postings = indiceInversoAtor.read(exemplo);
+        List<ParPalavraAtorIDFreq> postings = indiceInversoAtor.read(exemplo.hashCode());
         for (ParPalavraAtorIDFreq p : postings) {
             resultado.add(read(p.getAtorId()));
         }

@@ -23,38 +23,35 @@ public class ArquivoSerie extends Arquivo<Serie> {
     }
 
     public List<Serie> searchTfIdf(String query) throws Exception {
+        // 1) Tokeniza a consulta
         List<String> termos = TextoUtils.tokenize(query);
-        int N = this.count();  // total de séries
+        // 2) Número total de séries
+        int N = this.count();
+        // 3) Acumula scores por ID de série
         Map<Integer, Double> scores = new HashMap<>();
 
         for (String termo : termos) {
-            // monta chave para ler no índice invertido
-            ParPalavraSerieIDFreq exemplo = new ParPalavraSerieIDFreq(termo, -1, -1);
-            List<ParPalavraSerieIDFreq> postings = indiceInversoSerie.read(exemplo);
-            int DF = postings.size();
-            if (DF == 0) {
+            int h = termo.hashCode();
+            ParPalavraSerieIDFreq p = indiceInversoSerie.read(h);
+            if (p == null) {
                 continue;
             }
-            double idf = Math.log(N / (double) DF);
-
-            for (ParPalavraSerieIDFreq p : postings) {
-                double tfidf = p.getFreq() * idf;
-                scores.merge(p.getSerieId(), tfidf, Double::sum);
-            }
+            // Aqui DF = 1, pois HashExtensivel guarda um único registro por hash
+            double idf = Math.log(N / 1.0);
+            double tfidf = p.getFreq() * idf;
+            scores.put(p.getSerieId(), tfidf);
         }
 
-        // ordena IDs por score e mapeia para objetos
-        return scores.entrySet().stream()
-                .sorted(Map.Entry.<Integer, Double>comparingByValue(Comparator.reverseOrder()))
-                .map(e -> {
-                    try {
-                        return this.read(e.getKey());
-                    } catch (Exception ex) {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        // 4) Ordena os IDs por score decrescente
+        List<Map.Entry<Integer, Double>> entries = new ArrayList<>(scores.entrySet());
+        entries.sort((a, b) -> Double.compare(b.getValue(), a.getValue()));
+
+        // 5) Constrói a lista final de objetos
+        List<Serie> resultado = new ArrayList<>();
+        for (Map.Entry<Integer, Double> e : entries) {
+            resultado.add(this.read(e.getKey()));
+        }
+        return resultado;
     }
 
     @Override
@@ -77,7 +74,7 @@ public class ArquivoSerie extends Arquivo<Serie> {
         Map<String, Integer> oldFreqs = TextoUtils.termFrequencies(antigo.getNome());
         for (Map.Entry<String, Integer> e : oldFreqs.entrySet()) {
             ParPalavraSerieIDFreq p = new ParPalavraSerieIDFreq(e.getKey(), antigo.getID(), e.getValue());
-            indiceInversoSerie.delete(p);
+            indiceInversoSerie.delete(p.hashCode());
         }
         boolean ok = super.update(novo);
         if (!ok) {
@@ -95,6 +92,7 @@ public class ArquivoSerie extends Arquivo<Serie> {
         return true;
     }
 
+    /*
     public boolean update(Serie novaSerie, String nome) throws Exception {
         Serie serieAntiga = read(nome);
         if (super.update(novaSerie)) {
@@ -106,7 +104,7 @@ public class ArquivoSerie extends Arquivo<Serie> {
         }
         return false;
     }
-
+     */
     @Override
     public boolean delete(int id) throws Exception {
         Serie se = super.read(id);
@@ -116,7 +114,7 @@ public class ArquivoSerie extends Arquivo<Serie> {
         Map<String, Integer> freqs = TextoUtils.termFrequencies(se.getNome());
         for (Map.Entry<String, Integer> e : freqs.entrySet()) {
             ParPalavraSerieIDFreq p = new ParPalavraSerieIDFreq(e.getKey(), id, e.getValue());
-            indiceInversoSerie.delete(p);
+            indiceInversoSerie.delete(p.hashCode());
         }
         indiceIndiretoNomeSerie.delete(ParNomeSerieID.hash(se.getNome()));
         return super.delete(id);
@@ -143,7 +141,7 @@ public class ArquivoSerie extends Arquivo<Serie> {
     public List<Serie> searchByTerm(String termo) throws Exception {
         List<Serie> resultado = new ArrayList<>();
         ParPalavraSerieIDFreq exemplo = new ParPalavraSerieIDFreq(termo, -1, -1);
-        List<ParPalavraSerieIDFreq> postings = indiceInversoSerie.read(exemplo);
+        List<ParPalavraSerieIDFreq> postings = indiceInversoSerie.read(exemplo.hashCode());
         for (ParPalavraSerieIDFreq p : postings) {
             resultado.add(read(p.getSerieId()));
         }

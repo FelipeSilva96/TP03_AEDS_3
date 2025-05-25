@@ -1,7 +1,7 @@
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Scanner;
+import java.util.*;
 
 public class MenuEpisodios {
 
@@ -251,7 +251,7 @@ public class MenuEpisodios {
                     if (resp == 'S' || resp == 's') {
 
                         // Salva as alterações no arquivo
-                        boolean alterado = arqEpisodios.update(episodio, nome);
+                        boolean alterado = arqEpisodios.update(episodio);
 
                         if (alterado) {
 

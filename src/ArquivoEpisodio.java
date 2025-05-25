@@ -31,35 +31,28 @@ public class ArquivoEpisodio extends Arquivo<Episodio> {
 
     public List<Episodio> searchTfIdf(String query) throws Exception {
         List<String> termos = TextoUtils.tokenize(query);
-        int N = this.count();  
+        int N = this.count();
         Map<Integer, Double> scores = new HashMap<>();
 
         for (String termo : termos) {
-            ParPalavraEpisodioIDFreq exemplo = new ParPalavraEpisodioIDFreq(termo, -1, -1);
-            List<ParPalavraEpisodioIDFreq> postings = indiceInversoEpisodio.read(exemplo);
-            int DF = postings.size();
-            if (DF == 0) {
+            int h = termo.hashCode();
+            ParPalavraEpisodioIDFreq p = indiceInversoEpisodio.read(h);
+            if (p == null) {
                 continue;
             }
-            double idf = Math.log(N / (double) DF);
-
-            for (ParPalavraEpisodioIDFreq p : postings) {
-                double tfidf = p.getFreq() * idf;
-                scores.merge(p.getEpisodioId(), tfidf, Double::sum);
-            }
+            double idf = Math.log(N / 1.0);
+            double tfidf = p.getFreq() * idf;
+            scores.put(p.getEpisodioId(), tfidf);
         }
 
-        return scores.entrySet().stream()
-                .sorted(Map.Entry.<Integer, Double>comparingByValue(Comparator.reverseOrder()))
-                .map(e -> {
-                    try {
-                        return this.read(e.getKey());
-                    } catch (Exception ex) {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        List<Map.Entry<Integer, Double>> entries = new ArrayList<>(scores.entrySet());
+        entries.sort((a, b) -> Double.compare(b.getValue(), a.getValue()));
+
+        List<Episodio> resultado = new ArrayList<>();
+        for (Map.Entry<Integer, Double> e : entries) {
+            resultado.add(this.read(e.getKey()));
+        }
+        return resultado;
     }
 
     @Override
@@ -82,7 +75,7 @@ public class ArquivoEpisodio extends Arquivo<Episodio> {
         Map<String, Integer> oldFreqs = TextoUtils.termFrequencies(antigo.getNome());
         for (Map.Entry<String, Integer> e : oldFreqs.entrySet()) {
             ParPalavraEpisodioIDFreq p = new ParPalavraEpisodioIDFreq(e.getKey(), antigo.getID(), e.getValue());
-            indiceInversoEpisodio.delete(p);
+            indiceInversoEpisodio.delete(p.hashCode());
         }
         boolean ok = super.update(novo);
         if (!ok) {
@@ -149,7 +142,7 @@ public class ArquivoEpisodio extends Arquivo<Episodio> {
     public List<Episodio> searchByTerm(String termo) throws Exception {
         List<Episodio> resultado = new ArrayList<>();
         ParPalavraEpisodioIDFreq exemplo = new ParPalavraEpisodioIDFreq(termo, -1, -1);
-        List<ParPalavraEpisodioIDFreq> postings = indiceInversoEpisodio.read(exemplo);
+        List<ParPalavraEpisodioIDFreq> postings = indiceInversoEpisodio.read(exemplo.hashCode());
         for (ParPalavraEpisodioIDFreq p : postings) {
             resultado.add(read(p.getEpisodioId()));
         }
