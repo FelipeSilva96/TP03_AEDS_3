@@ -138,29 +138,6 @@ public class MenuSeries {
         }
     }
 
-    /*  // ANTIGO
-    public void buscarSerie() {
-        System.out.print("\nnome da Serie: ");
-        String nome = scan.nextLine();  // Lê o ID digitado pelo usuário
-        // Limpar o buffer após o nextInt()
-
-        if (nome != null) {
-            try {
-                Serie serie = arqSeries.read(nome);  // Chama o método de leitura da classe Arquivo
-                if (serie != null) {
-                    mostraSerie(serie);  // Exibe os detalhes do serie encontrado
-                } else {
-                    System.out.println("Serie não encontrada.");
-                }
-            } catch (Exception e) {
-                System.out.println("Erro do sistema. Não foi possível buscar VELHO a serie!");
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("ID inválido.");
-        }
-    }
-     */
     public void buscarSerie() {
         System.out.print("\nnome da Serie: ");
         String nome = scan.nextLine();

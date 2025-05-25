@@ -149,24 +149,6 @@ public class ArquivoEpisodio extends Arquivo<Episodio> {
         return resultado;
     }
 
-
-    /*
-    public boolean update(Episodio novoEpisodio, String antiga) throws Exception {
-        Episodio episodioAntigo = readNome(antiga);
-        if (super.update(novoEpisodio)) {
-            if (novoEpisodio.getNome().compareTo(episodioAntigo.getNome()) != 0) {
-                indiceIndiretoNomeEpisodio.delete(ParNomeEpisodioID.hash(episodioAntigo.getNome()));
-                indiceIndiretoNomeEpisodio.create(new ParNomeEpisodioID(novoEpisodio.getNome(), novoEpisodio.getID()));
-            }
-            if (novoEpisodio.getID() != episodioAntigo.getID()) {
-                indiceIndiretoIDSerieIDEpisodio.delete(new ParIDSerieIDEpisodio(episodioAntigo.idSerie, episodioAntigo.getID()));
-                indiceIndiretoIDSerieIDEpisodio.create(new ParIDSerieIDEpisodio(novoEpisodio.idSerie, novoEpisodio.id));
-            }
-            return true;
-        }
-        return false;
-    }
-     */
     public HashExtensivel<ParPalavraEpisodioIDFreq> getIndiceInverso() {
         return indiceInversoEpisodio;
     }

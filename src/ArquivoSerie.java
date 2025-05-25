@@ -23,11 +23,8 @@ public class ArquivoSerie extends Arquivo<Serie> {
     }
 
     public List<Serie> searchTfIdf(String query) throws Exception {
-        // 1) Tokeniza a consulta
         List<String> termos = TextoUtils.tokenize(query);
-        // 2) Número total de séries
         int N = this.count();
-        // 3) Acumula scores por ID de série
         Map<Integer, Double> scores = new HashMap<>();
 
         for (String termo : termos) {
@@ -36,17 +33,14 @@ public class ArquivoSerie extends Arquivo<Serie> {
             if (p == null) {
                 continue;
             }
-            // Aqui DF = 1, pois HashExtensivel guarda um único registro por hash
             double idf = Math.log(N / 1.0);
             double tfidf = p.getFreq() * idf;
             scores.put(p.getSerieId(), tfidf);
         }
 
-        // 4) Ordena os IDs por score decrescente
         List<Map.Entry<Integer, Double>> entries = new ArrayList<>(scores.entrySet());
         entries.sort((a, b) -> Double.compare(b.getValue(), a.getValue()));
 
-        // 5) Constrói a lista final de objetos
         List<Serie> resultado = new ArrayList<>();
         for (Map.Entry<Integer, Double> e : entries) {
             resultado.add(this.read(e.getKey()));
@@ -92,19 +86,6 @@ public class ArquivoSerie extends Arquivo<Serie> {
         return true;
     }
 
-    /*
-    public boolean update(Serie novaSerie, String nome) throws Exception {
-        Serie serieAntiga = read(nome);
-        if (super.update(novaSerie)) {
-            if (novaSerie.getNome().compareTo(serieAntiga.getNome()) != 0) {
-                indiceIndiretoNomeSerie.delete(ParNomeSerieID.hash(serieAntiga.getNome()));
-                indiceIndiretoNomeSerie.create(new ParNomeSerieID(novaSerie.getNome(), novaSerie.getID()));
-            }
-            return true;
-        }
-        return false;
-    }
-     */
     @Override
     public boolean delete(int id) throws Exception {
         Serie se = super.read(id);

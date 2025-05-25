@@ -47,12 +47,11 @@ public class ArquivoAtor extends Arquivo<Ator> {
             if (p == null) {
                 continue;
             }
-            double idf = Math.log(N / 1.0);  // DF sempre =1 no HashExtensivel
+            double idf = Math.log(N / 1.0); 
             double tfidf = p.getFreq() * idf;
             scores.put(p.getAtorId(), tfidf);
         }
 
-        // Ordena manualmente
         List<Map.Entry<Integer, Double>> entries = new ArrayList<>(scores.entrySet());
         entries.sort((a, b) -> Double.compare(b.getValue(), a.getValue()));
 
@@ -77,19 +76,6 @@ public class ArquivoAtor extends Arquivo<Ator> {
         return id;
     }
 
-    /*
-    public boolean update(Ator novoAtor, String antiga) throws Exception {
-        Ator AtorAntigo = readNome(antiga);
-        if (super.update(novoAtor)) {
-            if (novoAtor.getNome().compareTo(AtorAntigo.getNome()) != 0) {
-                indiceIndiretoNomeAtor.delete(ParAtorNomeID.hash(AtorAntigo.getNome()));
-                indiceIndiretoNomeAtor.create(new ParAtorNomeID(novoAtor.getNome(), novoAtor.getID()));
-            }
-            return true;
-        }
-        return false;
-    }
-     */
     @Override
     public boolean update(Ator novo) throws Exception {
         Ator antigo = super.read(novo.getID());
@@ -171,17 +157,7 @@ public class ArquivoAtor extends Arquivo<Ator> {
         return resultado;
     }
 
-    /*
-    public List<Ator> searchByTerm(String termo) throws Exception {
-        List<Ator> resultado = new ArrayList<>();
-        ParPalavraAtorIDFreq exemplo = new ParPalavraAtorIDFreq(termo, -1, -1);
-        List<ParPalavraAtorIDFreq> postings = indiceInversoAtor.read(exemplo.hashCode());
-        for (ParPalavraAtorIDFreq p : postings) {
-            resultado.add(read(p.getAtorId()));
-        }
-        return resultado;
-    }
-     */
+  
     public boolean linkAtorSerie(int ator, int serie) throws Exception {
         boolean success = false;
 

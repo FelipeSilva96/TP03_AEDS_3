@@ -156,11 +156,9 @@ public class MenuAtor {
                         ator.nome = novoNome;  // Atualiza o nome se fornecido
                     }
 
-                    // Confirmação da alteração
                     System.out.print("\nConfirma as alterações? (S/N) ");
                     char resp = scan.next().charAt(0);
                     if (resp == 'S' || resp == 's') {
-                        // Salva as alterações no arquivo
                         boolean alterado = arqAtor.update(ator);
 
                         if (alterado) {

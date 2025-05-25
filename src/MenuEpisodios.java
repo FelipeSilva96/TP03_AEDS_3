@@ -59,29 +59,6 @@ public class MenuEpisodios {
         } while (opcao != 0);
     }
 
-    /* // ANTIGO
-    public void buscarEpisodio() {
-        System.out.print("\nNome do episodio: ");
-        String nome = scan.nextLine();  // Lê o ID digitado pelo usuário
-
-        if (nome != null) {
-            try {
-                Episodio episodio = arqEpisodios.readNome(nome);  // Chama o método de leitura da classe Arquivo
-                if (episodio != null) {
-                    mostraEpisodio(episodio);  // Exibe os detalhes do episodio encontrado
-                } else {
-                    System.out.println("Episodio não encontrado.");
-                }
-            } catch (Exception e) {
-                System.out.println("Erro do sistema. Não foi possível buscar o episodio!");
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("ID inválido.");
-        }
-    }*/
-
-   
     public void buscarEpisodio() {
         System.out.print("\nDigite termo de busca: ");
         String termo = scan.nextLine();
