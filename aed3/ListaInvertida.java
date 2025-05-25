@@ -1,4 +1,17 @@
-
+/*********
+ * LISTA INVERTIDA
+ * String termo, int dado
+ * 
+ * Os nomes dos métodos foram mantidos em inglês
+ * apenas para manter a coerência com o resto da
+ * disciplina:
+ * - boolean create(String termo, int dado)
+ * - int[] read(int termo)
+ * - boolean delete(String termo, int dado)
+ * 
+ * Implementado pelo Prof. Marcos Kutova
+ * v1.0 - 2020
+ */
 package aed3;
 
 import java.io.ByteArrayInputStream;
