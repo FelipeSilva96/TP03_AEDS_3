@@ -138,6 +138,7 @@ public class MenuSeries {
         }
     }
 
+    /*  // ANTIGO
     public void buscarSerie() {
         System.out.print("\nnome da Serie: ");
         String nome = scan.nextLine();  // Lê o ID digitado pelo usuário
@@ -157,6 +158,24 @@ public class MenuSeries {
             }
         } else {
             System.out.println("ID inválido.");
+        }
+    }
+     */
+    public void buscarSerie() {
+        System.out.print("\nnome da Serie: ");
+        String nome = scan.nextLine();
+        try {
+            List<Serie> resultados = arqSeries.searchTfIdf(nome);
+            if (resultados.isEmpty()) {
+                System.out.println("Serie não encontrada.");
+            } else {
+                for (Serie s : resultados) {
+                    mostraSerie(s);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao buscar séries!");
+            e.printStackTrace();
         }
     }
 

@@ -62,6 +62,7 @@ public class MenuAtor {
         } while (opcao != 0);
     }
 
+    /* // ANTIGO
     public void buscarAtor() {
         System.out.print("\nnome do Ator: ");
         String nome = scan.nextLine();  // Lê o ID digitado pelo usuário
@@ -81,6 +82,23 @@ public class MenuAtor {
             }
         } else {
             System.out.println("Nome não encontrado.");
+        }
+    }*/
+    public void buscarAtor() {
+        System.out.print("\nDigite termo de busca: ");
+        String termo = scan.nextLine();
+        try {
+            List<Ator> resultados = arqAtor.searchTfIdf(termo);
+            if (resultados.isEmpty()) {
+                System.out.println("Ator não encontrado.");
+            } else {
+                for (Ator a : resultados) {
+                    mostrarAtor(a);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao buscar atores!");
+            e.printStackTrace();
         }
     }
 

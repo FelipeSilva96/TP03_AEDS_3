@@ -59,6 +59,7 @@ public class MenuEpisodios {
         } while (opcao != 0);
     }
 
+    /* // ANTIGO
     public void buscarEpisodio() {
         System.out.print("\nNome do episodio: ");
         String nome = scan.nextLine();  // Lê o ID digitado pelo usuário
@@ -77,6 +78,25 @@ public class MenuEpisodios {
             }
         } else {
             System.out.println("ID inválido.");
+        }
+    }*/
+
+   
+    public void buscarEpisodio() {
+        System.out.print("\nDigite termo de busca: ");
+        String termo = scan.nextLine();
+        try {
+            List<Episodio> resultados = arqEpisodios.searchTfIdf(termo);
+            if (resultados.isEmpty()) {
+                System.out.println("Episodio não encontrado.");
+            } else {
+                for (Episodio ep : resultados) {
+                    mostraEpisodio(ep);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao buscar episódios!");
+            e.printStackTrace();
         }
     }
 

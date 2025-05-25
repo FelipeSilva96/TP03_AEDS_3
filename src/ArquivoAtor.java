@@ -1,9 +1,6 @@
 
-/* ArquivoAtor.java */
 import aed3.*;
-import java.util.Map;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class ArquivoAtor extends Arquivo<Ator> {
 
@@ -37,6 +34,39 @@ public class ArquivoAtor extends Arquivo<Ator> {
                 ".\\dados\\atores\\indiceInversoAtor.d.db",
                 ".\\dados\\atores\\indiceInversoAtor.c.db"
         );
+    }
+
+    public List<Ator> searchTfIdf(String query) throws Exception {
+        List<String> termos = TextoUtils.tokenize(query);
+        int N = this.count();  // total de atores
+        Map<Integer, Double> scores = new HashMap<>();
+
+        for (String termo : termos) {
+            ParPalavraAtorIDFreq exemplo = new ParPalavraAtorIDFreq(termo, -1, -1);
+            List<ParPalavraAtorIDFreq> postings = indiceInversoAtor.read(exemplo);
+            int DF = postings.size();
+            if (DF == 0) {
+                continue;
+            }
+            double idf = Math.log(N / (double) DF);
+
+            for (ParPalavraAtorIDFreq p : postings) {
+                double tfidf = p.getFreq() * idf;
+                scores.merge(p.getAtorId(), tfidf, Double::sum);
+            }
+        }
+
+        return scores.entrySet().stream()
+                .sorted(Map.Entry.<Integer, Double>comparingByValue(Comparator.reverseOrder()))
+                .map(e -> {
+                    try {
+                        return this.read(e.getKey());
+                    } catch (Exception ex) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     @Override
