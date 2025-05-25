@@ -1,68 +1,65 @@
 
 import aed3.*;
+import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
 public class ArquivoSerie extends Arquivo<Serie> {
 
+    private HashExtensivel<ParPalavraSerieIDFreq> indiceInversoSerie;
+    private HashExtensivel<ParNomeSerieID> indiceIndiretoNomeSerie;
     Arquivo<Serie> arqSeries;
-    HashExtensivel<ParNomeSerieID> indiceIndiretoNomeSerie;
 
     public ArquivoSerie() throws Exception {
         super("series", Serie.class.getConstructor());
-        indiceIndiretoNomeSerie = new HashExtensivel<>(
-                ParNomeSerieID.class.getConstructor(),
-                4,
-                ".\\dados\\series\\indiceNomeSerie.d.db", // diretório
-                ".\\dados\\series\\indiceNomeSerie.c.db" // cestos 
+        this.indiceIndiretoNomeSerie = new HashExtensivel<>(
+                ParNomeSerieID.class.getConstructor(), 4,
+                ".\\dados\\series\\indiceNomeSerie.d.db",
+                ".\\dados\\series\\indiceNomeSerie.c.db"
+        );
+        this.indiceInversoSerie = new HashExtensivel<>(
+                ParPalavraSerieIDFreq.class.getConstructor(), 4,
+                ".\\dados\\series\\indiceInversoSerie.d.db",
+                ".\\dados\\series\\indiceInversoSerie.c.db"
         );
     }
 
     @Override
     public int create(Serie se) throws Exception {
         int id = super.create(se);
-        indiceIndiretoNomeSerie.create(new ParNomeSerieID(se.getNome(), id));
+        Map<String, Integer> freqs = TextoUtils.termFrequencies(se.getNome());
+        for (Map.Entry<String, Integer> entry : freqs.entrySet()) {
+            ParPalavraSerieIDFreq p = new ParPalavraSerieIDFreq(entry.getKey(), id, entry.getValue());
+            indiceInversoSerie.create(p);
+        }
         return id;
     }
 
-    public Serie read(String nome) throws Exception {
-        ParNomeSerieID pni = indiceIndiretoNomeSerie.read(ParNomeSerieID.hash(nome));
-        if (pni == null) {
-            return null;
-        }
-        return read(pni.getId());
-    }
-
-    public boolean delete(String nome) throws Exception {
-        ParNomeSerieID pni = indiceIndiretoNomeSerie.read(ParNomeSerieID.hash(nome));
-        if (pni != null) {
-            if (delete(pni.getId())) {
-                return indiceIndiretoNomeSerie.delete(ParNomeSerieID.hash(nome));
-            }
-        }
-        return false;
-    }
-
     @Override
-    public boolean delete(int id) throws Exception {
-        Serie se = super.read(id);
-        if (se != null) {
-            if (super.delete(id)) {
-                return indiceIndiretoNomeSerie.delete(ParNomeSerieID.hash(se.getNome()));
-            }
+    public boolean update(Serie novo) throws Exception {
+        Serie antigo = super.read(novo.getID());
+        if (antigo == null) {
+            return false;
         }
-        return false;
-    }
-
-    @Override
-    public boolean update(Serie novaSerie) throws Exception {
-        Serie serieAntiga = read(novaSerie.getNome());
-        if (super.update(novaSerie)) {
-            if (novaSerie.getNome().compareTo(serieAntiga.getNome()) != 0) {
-                indiceIndiretoNomeSerie.delete(ParNomeSerieID.hash(serieAntiga.getNome()));
-                indiceIndiretoNomeSerie.create(new ParNomeSerieID(novaSerie.getNome(), novaSerie.getID()));
-            }
-            return true;
+        Map<String, Integer> oldFreqs = TextoUtils.termFrequencies(antigo.getNome());
+        for (Map.Entry<String, Integer> e : oldFreqs.entrySet()) {
+            ParPalavraSerieIDFreq p = new ParPalavraSerieIDFreq(e.getKey(), antigo.getID(), e.getValue());
+            indiceInversoSerie.delete(p);
         }
-        return false;
+        boolean ok = super.update(novo);
+        if (!ok) {
+            return false;
+        }
+        if (!antigo.getNome().equals(novo.getNome())) {
+            indiceIndiretoNomeSerie.delete(ParNomeSerieID.hash(antigo.getNome()));
+            indiceIndiretoNomeSerie.create(new ParNomeSerieID(novo.getNome(), novo.getID()));
+        }
+        Map<String, Integer> newFreqs = TextoUtils.termFrequencies(novo.getNome());
+        for (Map.Entry<String, Integer> e : newFreqs.entrySet()) {
+            ParPalavraSerieIDFreq p = new ParPalavraSerieIDFreq(e.getKey(), novo.getID(), e.getValue());
+            indiceInversoSerie.create(p);
+        }
+        return true;
     }
 
     public boolean update(Serie novaSerie, String nome) throws Exception {
@@ -75,5 +72,52 @@ public class ArquivoSerie extends Arquivo<Serie> {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean delete(int id) throws Exception {
+        Serie se = super.read(id);
+        if (se == null) {
+            return false;
+        }
+        Map<String, Integer> freqs = TextoUtils.termFrequencies(se.getNome());
+        for (Map.Entry<String, Integer> e : freqs.entrySet()) {
+            ParPalavraSerieIDFreq p = new ParPalavraSerieIDFreq(e.getKey(), id, e.getValue());
+            indiceInversoSerie.delete(p);
+        }
+        indiceIndiretoNomeSerie.delete(ParNomeSerieID.hash(se.getNome()));
+        return super.delete(id);
+    }
+
+    public boolean delete(String nome) throws Exception {
+        ParNomeSerieID pni = indiceIndiretoNomeSerie.read(ParNomeSerieID.hash(nome));
+        if (pni != null) {
+            if (delete(pni.getId())) {
+                return indiceIndiretoNomeSerie.delete(ParNomeSerieID.hash(nome));
+            }
+        }
+        return false;
+    }
+
+    public Serie read(String nome) throws Exception {
+        ParNomeSerieID pni = indiceIndiretoNomeSerie.read(ParNomeSerieID.hash(nome));
+        if (pni == null) {
+            return null;
+        }
+        return read(pni.getId());
+    }
+
+    public List<Serie> searchByTerm(String termo) throws Exception {
+        List<Serie> resultado = new ArrayList<>();
+        ParPalavraSerieIDFreq exemplo = new ParPalavraSerieIDFreq(termo, -1, -1);
+        List<ParPalavraSerieIDFreq> postings = indiceInversoSerie.read(exemplo);
+        for (ParPalavraSerieIDFreq p : postings) {
+            resultado.add(read(p.getSerieId()));
+        }
+        return resultado;
+    }
+
+    public HashExtensivel<ParPalavraSerieIDFreq> getIndiceInverso() {
+        return indiceInversoSerie;
     }
 }

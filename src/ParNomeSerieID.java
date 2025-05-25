@@ -49,7 +49,7 @@ public class ParNomeSerieID implements RegistroHashExtensivel {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
         byte[] vb = new byte[nomeTamanho];
-        copyStringToByteArray(vb, nome); //copia a string para o array de bytes e adiciona espacos vazios no final se necessario
+        copyStringToByteArray(vb, nome); 
         dos.write(vb);
         dos.writeInt(this.id);
         return baos.toByteArray();
@@ -68,16 +68,7 @@ public class ParNomeSerieID implements RegistroHashExtensivel {
         return Math.abs(nome.hashCode());
     }
 
-    /* 
-    public static int hash(String nome) throws IllegalArgumentException {
-
-        long nomeLong = Long.parseLong(nome);
-
-        int hashValue = (int) (nomeLong % (int) (1e9 + 7));
-
-        return Math.abs(hashValue);
-    }
-     */
+ 
     public void copyStringToByteArray(byte[] targetArray, String value) {
         byte[] stringBytes = value.getBytes(); // 
         int copyLength = Math.min(stringBytes.length, this.nomeTamanho);
