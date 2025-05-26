@@ -1,7 +1,8 @@
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
+import java.util.List; 
+import java.util.ArrayList; 
 
 public class MenuEpisodios {
 
@@ -16,7 +17,6 @@ public class MenuEpisodios {
     }
 
     public void menu() throws Exception {
-
         int opcao;
         do {
 
@@ -61,13 +61,16 @@ public class MenuEpisodios {
 
     public void buscarEpisodio() {
         System.out.print("\nNome do episodio: ");
-        String nome = scan.nextLine();  // Lê o ID digitado pelo usuário
+        String nome = scan.nextLine();
 
-        if (nome != null) {
+        if (nome != null && !nome.trim().isEmpty()) {
             try {
-                Episodio episodio = arqEpisodios.readNome(nome);  // Chama o método de leitura da classe Arquivo
-                if (episodio != null) {
-                    mostraEpisodio(episodio);  // Exibe os detalhes do episodio encontrado
+                List<Episodio> episodios = arqEpisodios.readNome(nome); 
+                if (episodios != null && !episodios.isEmpty()) {
+                    mostraEpisodio(episodios.get(0));
+                    if (episodios.size() > 1) {
+                         System.out.println("Nota: Foram encontrados múltiplos episódios com termos semelhantes. Exibindo o primeiro.");
+                    }
                 } else {
                     System.out.println("Episodio não encontrado.");
                 }
@@ -76,13 +79,13 @@ public class MenuEpisodios {
                 e.printStackTrace();
             }
         } else {
-            System.out.println("ID inválido.");
+            System.out.println("Nome do episódio inválido.");
         }
     }
 
     public void incluirEpisodio() throws Exception {
-        String nomeSerie;
-        int idSerie;
+        String nomeSerieBusca;
+        int idSerie = -1; 
         String nome = "";
         int temporada = 0;
         LocalDate dataLancamento = null;
@@ -93,19 +96,31 @@ public class MenuEpisodios {
 
         System.out.println("\nInclusão de episodio");
 
-        System.out.print("\nNome da serie (Id menor que 1 ou vazio para cancelar): ");
-        nomeSerie = scan.nextLine();
-        idSerie = arqSerie.read(nomeSerie).getID();
-
-        if (nomeSerie == null) {
-            System.out.println("\nnome vazio\n");
+        System.out.print("\nNome da serie a qual o episódio pertence (ou vazio para cancelar): ");
+        nomeSerieBusca = scan.nextLine();
+        if (nomeSerieBusca.trim().isEmpty()) {
+            System.out.println("Inclusão de episódio cancelada.");
             return;
         }
 
+        List<Serie> seriesEncontradas = arqSerie.readNome(nomeSerieBusca);
+        if (seriesEncontradas == null || seriesEncontradas.isEmpty()) {
+            System.out.println("Nenhuma série encontrada com o nome '" + nomeSerieBusca + "'. Não é possível adicionar episódio.");
+            return;
+        }
+        
+        Serie serieSelecionada = seriesEncontradas.get(0); 
+        if (seriesEncontradas.size() > 1) {
+            System.out.println("Múltiplas séries encontradas. Selecionando a primeira: " + serieSelecionada.getNome());
+        }
+        idSerie = serieSelecionada.getID();
+
+
         do {
-            System.out.print("\nNome (min. de 2 letras ou vazio para cancelar): ");
+            System.out.print("\nNome do episódio (min. de 2 letras ou vazio para cancelar): ");
             nome = scan.nextLine();
-            if (nome.length() == 0) {
+            if (nome.trim().isEmpty()) { 
+                System.out.println("Inclusão de episódio cancelada.");
                 return;
             }
             if (nome.length() < 2) {
@@ -114,7 +129,6 @@ public class MenuEpisodios {
         } while (nome.length() < 2);
 
         do {
-
             dadosCorretos = false;
             System.out.print("Temporada: ");
             if (scan.hasNextInt()) {
@@ -123,8 +137,7 @@ public class MenuEpisodios {
             } else {
                 System.err.println("Temporada inválida! Por favor, insira um número válido.");
             }
-
-            scan.nextLine(); // Limpar o buffer 
+            scan.nextLine(); 
         } while (!dadosCorretos);
 
         do {
@@ -141,158 +154,185 @@ public class MenuEpisodios {
 
         do {
             dadosCorretos = false;
-            System.out.print("Duração: ");
-
+            System.out.print("Duração (em minutos): ");
             if (scan.hasNextInt()) {
                 duracao = scan.nextInt();
-                scan.nextLine();
+                scan.nextLine(); 
                 if (duracao > 0) {
                     dadosCorretos = true;
+                } else {
+                     System.err.println("Duração deve ser maior que zero.");
                 }
             } else {
-                System.out.println("Duração invalida:");
-
+                System.err.println("Duração inválida! Por favor, insira um número válido.");
+                scan.nextLine(); 
             }
-
         } while (!dadosCorretos);
 
-        System.out.print("\nConfirma a inclusão da episodio? (S/N) ");
-        char resp = scan.next().charAt(0);
+        System.out.print("\nConfirma a inclusão do episodio? (S/N) ");
+        char resp = scan.nextLine().charAt(0); 
         if (resp == 'S' || resp == 's') {
             try {
                 Episodio ep = new Episodio(nome, temporada, dataLancamento, duracao, idSerie);
                 arqEpisodios.create(ep);
-
-                System.out.println("episodio incluído com sucesso.");
-
+                System.out.println("Episodio incluído com sucesso.");
             } catch (Exception e) {
                 System.out.println("Erro do sistema. Não foi possível incluir o episodio!");
+                 e.printStackTrace();
             }
+        } else {
+             System.out.println("Inclusão cancelada.");
         }
     }
 
     public void alterarEpisodio() {
-
         System.out.print("\nDigite o nome do episodio a ser alterado: ");
         String nome = scan.nextLine();
+        Episodio episodioParaAlterar = null;
 
-        if (nome != null) {
+        if (nome != null && !nome.trim().isEmpty()) {
             try {
-                // Tenta ler o episodio com o ID fornecido
-                Episodio episodio = arqEpisodios.readNome(nome);
-                if (episodio != null) {
-                    System.out.println("episodio encontrado:");
-                    mostraEpisodio(episodio);  // Exibe os dados do episodio para confirmação
-
-                    // Alteração de Nome
-                    System.out.print("\nNovo nome (deixe em branco para manter o anterior): ");
-                    String novoNome = scan.nextLine();
-                    if (!novoNome.isEmpty()) {
-                        episodio.nome = novoNome;  // Atualiza o nome se fornecido
-                    }
-
-                    // Alteração de Temporada
-                    System.out.print("Nova temporada: ");
-
-                    if (scan.hasNextInt()) {
-                        int novaTemp = scan.nextInt();
-                        episodio.temporada = novaTemp;
-                    } else {
-                        System.out.println("Insira uma temporada válida");
-                    }
-                    scan.nextLine(); // TENATNDO LIMPAR BUFFER
-                    // Alteração de data de lançamento
-                    System.out.print("Nova data de lançamento (DD/MM/AAAA) (deixe em branco para manter a anterior): ");
-                    String novaDataStr = scan.nextLine();
-                    if (!novaDataStr.isEmpty()) {
-                        try {
-                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                            episodio.dataLancamento = LocalDate.parse(novaDataStr, formatter);  // Atualiza a data de lançamento se fornecida
-                        } catch (Exception e) {
-                            System.err.println("Data inválida. Valor mantido.");
-                        }
-                    }
-
-                    // Alteração de Temporada
-                    System.out.print("Nova duração: ");
-
-                    if (scan.hasNextInt()) {
-                        int novaDuracao = scan.nextInt();
-                        episodio.duracao = novaDuracao;
-                    } else {
-                        System.out.println("Insira uma duração valida válida");
-                    }
-                    scan.nextLine();  // Limpa o buffer
-
-                    // Confirmação da alteração
-                    System.out.print("\nConfirma as alterações? (S/N) ");
-                    char resp = scan.next().charAt(0);
-
-                    if (resp == 'S' || resp == 's') {
-
-                        // Salva as alterações no arquivo
-                        boolean alterado = arqEpisodios.update(episodio, nome);
-
-                        if (alterado) {
-
-                            System.out.println("episodio alterado com sucesso.");
-
-                        } else {
-
-                            System.out.println("Erro ao alterar o episodio.");
-                        }
-                    } else {
-                        System.out.println("Alterações canceladas.");
+                List<Episodio> episodiosEncontrados = arqEpisodios.readNome(nome);
+                if (episodiosEncontrados != null && !episodiosEncontrados.isEmpty()) {
+                    
+                    episodioParaAlterar = episodiosEncontrados.get(0);
+                     if (episodiosEncontrados.size() > 1) {
+                        System.out.println("Nota: Múltiplos episódios encontrados com este nome. Alterando o primeiro encontrado.");
                     }
                 } else {
-                    System.out.println("episodio não encontrado.");
+                    System.out.println("Episodio não encontrado.");
+                    return;
+                }
+
+                System.out.println("Episodio encontrado:");
+                mostraEpisodio(episodioParaAlterar);
+
+                System.out.print("\nNovo nome (deixe em branco para manter o anterior '" + episodioParaAlterar.nome + "'): ");
+                String novoNome = scan.nextLine();
+                if (!novoNome.trim().isEmpty()) {
+                    episodioParaAlterar.nome = novoNome;
+                }
+
+                System.out.print("Nova temporada (atual: " + episodioParaAlterar.temporada + ", deixe em branco ou digite 0 para manter): ");
+                String tempInput = scan.nextLine();
+                if (!tempInput.trim().isEmpty()) {
+                     try {
+                        int novaTemp = Integer.parseInt(tempInput);
+                        if (novaTemp != 0) episodioParaAlterar.temporada = novaTemp;
+                    } catch (NumberFormatException e) {
+                        System.out.println("Formato de temporada inválido. Temporada não alterada.");
+                    }
+                }
+
+                System.out.print("Nova data de lançamento (DD/MM/AAAA) (atual: " + episodioParaAlterar.dataLancamento.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + ", deixe em branco para manter): ");
+                String novaDataStr = scan.nextLine();
+                if (!novaDataStr.trim().isEmpty()) {
+                    try {
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                        episodioParaAlterar.dataLancamento = LocalDate.parse(novaDataStr, formatter);
+                    } catch (Exception e) {
+                        System.err.println("Data inválida. Valor mantido.");
+                    }
+                }
+
+                System.out.print("Nova duração (atual: " + episodioParaAlterar.duracao + ", deixe em branco ou digite 0 para manter): ");
+                String duracaoInput = scan.nextLine();
+                if (!duracaoInput.trim().isEmpty()) {
+                    try {
+                        int novaDuracao = Integer.parseInt(duracaoInput);
+                        if (novaDuracao != 0) episodioParaAlterar.duracao = novaDuracao;
+                    } catch (NumberFormatException e) {
+                        System.out.println("Formato de duração inválido. Duração não alterada.");
+                    }
+                }
+
+                System.out.print("\nConfirma as alterações? (S/N) ");
+                char resp = scan.nextLine().charAt(0); 
+
+                if (resp == 'S' || resp == 's') {
+                    boolean alterado = arqEpisodios.update(episodioParaAlterar, nome); 
+                    if (alterado) {
+                        System.out.println("Episodio alterado com sucesso.");
+                    } else {
+                        System.out.println("Erro ao alterar o episodio.");
+                    }
+                } else {
+                    System.out.println("Alterações canceladas.");
                 }
             } catch (Exception e) {
                 System.out.println("Erro do sistema. Não foi possível alterar o episodio!");
                 e.printStackTrace();
             }
         } else {
-            System.out.println("ID inválido.");
+            System.out.println("Nome do episódio inválido.");
         }
     }
 
     public void excluirEpisodio() throws Exception {
         System.out.print("\nDigite o nome da serie do episodio a ser excluído: ");
-        String serieNome = scan.nextLine();
-        int serieID = arqSerie.read(serieNome).getID();
+        String nomeSerieBusca = scan.nextLine();
+        Serie serieDoEpisodio = null;
+        int serieID = -1;
+
+        if (nomeSerieBusca.trim().isEmpty()) {
+            System.out.println("Nome da série não pode ser vazio.");
+            return;
+        }
+        List<Serie> seriesEncontradas = arqSerie.readNome(nomeSerieBusca);
+        if (seriesEncontradas == null || seriesEncontradas.isEmpty()) {
+            System.out.println("Nenhuma série encontrada com o nome '" + nomeSerieBusca + "'.");
+            return;
+        }
+        serieDoEpisodio = seriesEncontradas.get(0); 
+        if (seriesEncontradas.size() > 1) {
+             System.out.println("Múltiplas séries encontradas. Usando a primeira: " + serieDoEpisodio.getNome());
+        }
+        serieID = serieDoEpisodio.getID();
+
+
         System.out.print("\nDigite o nome do episodio a ser excluído: ");
-        String episodioNome = scan.nextLine();  // Lê o ID digitado pelo usuário
+        String episodioNome = scan.nextLine();
+        Episodio episodioParaExcluir = null;
 
-        if (episodioNome != null) {
+        if (episodioNome != null && !episodioNome.trim().isEmpty()) {
+            List<Episodio> episodiosEncontrados = arqEpisodios.readNome(episodioNome);
+            if (episodiosEncontrados != null) {
+                for (Episodio ep : episodiosEncontrados) {
+                    if (ep.idSerie == serieID) { 
+                        episodioParaExcluir = ep;
+                        break;
+                    }
+                }
+            }
+
+            if (episodioParaExcluir == null) {
+                 System.out.println("Episodio '" + episodioNome + "' não encontrado na série '" + serieDoEpisodio.getNome() + "'.");
+                 return;
+            }
+            
             try {
-                // Tenta ler o episodio com o ID fornecido
-                Episodio episodio = arqEpisodios.readNome(episodioNome);
-                if (episodio != null) {
-                    System.out.println("Episodio encontrado:");
-                    mostraEpisodio(episodio);  // Exibe os dados do episodio para confirmação
+                System.out.println("Episodio encontrado:");
+                mostraEpisodio(episodioParaExcluir);
 
-                    System.out.print("\nConfirma a exclusão do episodio? (S/N) ");
-                    char resp = scan.next().charAt(0);  // Lê a resposta do usuário
+                System.out.print("\nConfirma a exclusão do episodio? (S/N) ");
+                char resp = scan.nextLine().charAt(0); 
 
-                    if (resp == 'S' || resp == 's') {
-                        boolean excluido = arqEpisodios.delete(episodioNome, serieID);  // Chama o método de exclusão no arquivo
-                        if (excluido) {
-                            System.out.println("Episodio excluído com sucesso.");
-                        } else {
-                            System.out.println("Erro ao excluir o episodio.");
-                        }
+                if (resp == 'S' || resp == 's') {
+                    boolean excluido = arqEpisodios.delete(episodioParaExcluir.getNome(), serieID);
+                    if (excluido) {
+                        System.out.println("Episodio excluído com sucesso.");
                     } else {
-                        System.out.println("Exclusão cancelado.");
+                        System.out.println("Erro ao excluir o episodio.");
                     }
                 } else {
-                    System.out.println("Episodio não encontrado.");
+                    System.out.println("Exclusão cancelada.");
                 }
             } catch (Exception e) {
                 System.out.println("Erro do sistema. Não foi possível excluir o Episodio!");
                 e.printStackTrace();
             }
         } else {
-            System.out.println("ID inválido.");
+            System.out.println("Nome do episódio inválido.");
         }
     }
 
@@ -300,14 +340,13 @@ public class MenuEpisodios {
         if (episodio != null) {
             System.out.println("\nDetalhes do Episodio:");
             System.out.println("----------------------");
-
-            System.out.print("\nNome..............: " + episodio.nome);
-            System.out.print("\nTemporada.........: " + episodio.temporada);
-            System.out.print("\nData de Lançamento: " + episodio.dataLancamento.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-            System.out.println("\nDuração...........: " + episodio.duracao);
-            System.out.println();
+            System.out.println("ID................: " + episodio.id); 
+            System.out.println("Nome..............: " + episodio.nome);
+            System.out.println("Temporada.........: " + episodio.temporada);
+            System.out.println("Data de Lançamento: " + episodio.dataLancamento.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            System.out.println("Duração...........: " + episodio.duracao + " min"); 
+            System.out.println("ID Série..........: " + episodio.idSerie); 
             System.out.println("----------------------");
-
         }
     }
 }

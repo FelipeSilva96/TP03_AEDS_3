@@ -1,5 +1,4 @@
 
-/* ArquivoAtor.java */
 import aed3.*;
 import java.util.Map;
 import java.util.ArrayList;
@@ -35,9 +34,9 @@ public class ArquivoAtor extends Arquivo<Ator> {
                 ParIDSerieIDAtor.class.getConstructor(), 5,
                 ".\\dados\\atores\\indiceIndiretoSerieIDAtorID.db"
         );
-        indiceInversoAtor = new ListaInvertida(4, 
-               ".\\dados\\atores\\indiceIndiretoIDFreq.d.db", 
-               ".\\dados\\atores\\indiceIndiretoIDFreq.c.db");
+        indiceInversoAtor = new ListaInvertida(4,
+                ".\\dados\\atores\\indiceIndiretoIDFreq.d.db",
+                ".\\dados\\atores\\indiceIndiretoIDFreq.c.db");
     }
 
     @Override
@@ -50,8 +49,8 @@ public class ArquivoAtor extends Arquivo<Ator> {
 
         Map<String, Double> freqs = TextoUtils.termFrequencies(atorNome);
         for (Map.Entry<String, Double> entry : freqs.entrySet()) {
-            ElementoLista p = new ElementoLista(id, (float)(double)entry.getValue());
-            indiceInversoAtor.create(entry.getKey() ,p);
+            ElementoLista p = new ElementoLista(id, (float) (double) entry.getValue());
+            indiceInversoAtor.create(entry.getKey(), p);
         }
 
         indiceInversoAtor.incrementaEntidades();
@@ -59,19 +58,6 @@ public class ArquivoAtor extends Arquivo<Ator> {
         return id;
     }
 
-    /*
-    public boolean update(Ator novoAtor, String antiga) throws Exception {
-        Ator AtorAntigo = readNome(antiga);
-        if (super.update(novoAtor)) {
-            if (novoAtor.getNome().compareTo(AtorAntigo.getNome()) != 0) {
-                indiceIndiretoNomeAtor.delete(ParAtorNomeID.hash(AtorAntigo.getNome()));
-                indiceIndiretoNomeAtor.create(new ParAtorNomeID(novoAtor.getNome(), novoAtor.getID()));
-            }
-            return true;
-        }
-        return false;
-    }
-     */
     @Override
     public boolean update(Ator novo) throws Exception {
         Ator antigo = super.read(novo.getID());
@@ -87,7 +73,7 @@ public class ArquivoAtor extends Arquivo<Ator> {
                 indiceInversoAtor.delete(e.getKey(), antigo.id);
             }
         }
-        
+
         boolean ok = super.update(novo);
         if (!ok) {
             return false;
@@ -95,7 +81,7 @@ public class ArquivoAtor extends Arquivo<Ator> {
 
         Map<String, Double> newFreqs = TextoUtils.termFrequencies(novo.getNome());
         for (Map.Entry<String, Double> e : newFreqs.entrySet()) {
-            ElementoLista p = new ElementoLista(novo.getID(), (float)(double)e.getValue());
+            ElementoLista p = new ElementoLista(novo.getID(), (float) (double) e.getValue());
             indiceInversoAtor.create(e.getKey(), p);
         }
         return true;
@@ -138,11 +124,11 @@ public class ArquivoAtor extends Arquivo<Ator> {
         List<Ator> atores = new ArrayList<>();
 
         List<ElementoLista> lista = this.searchByWords(nome);
-        if(lista == null || lista.size()==0){
+        if (lista == null || lista.size() == 0) {
             return null;
         }
 
-        for(ElementoLista item : lista){
+        for (ElementoLista item : lista) {
             atores.add(read(item.getId()));
         }
 
@@ -162,12 +148,12 @@ public class ArquivoAtor extends Arquivo<Ator> {
         return resultado;
     }
 
-    public int elementoListaPosID(ElementoLista[] lista, int id){
-        int i =0;
+    public int elementoListaPosID(ElementoLista[] lista, int id) {
+        int i = 0;
 
-        while (i<lista.length){
+        while (i < lista.length) {
 
-            if(lista[i].getId()==id){
+            if (lista[i].getId() == id) {
                 return i;
             }
             i++;
@@ -188,39 +174,39 @@ public class ArquivoAtor extends Arquivo<Ator> {
             //recupera os id;freq do termo
             aux = indiceInversoAtor.read(entry.getKey());
             //calcular idf
-            if(aux.length<1 || indiceInversoAtor.numeroEntidades()<1){
+            if (aux.length < 1 || indiceInversoAtor.numeroEntidades() < 1) {
                 return null;
             }
 
-            double idf = Math.log((indiceInversoAtor.numeroEntidades()/aux.length))+1;
+            double idf = Math.log((indiceInversoAtor.numeroEntidades() / aux.length)) + 1;
             //multiplica freq por idf
-            for(int i=0; i<aux.length; i++){
-                aux[i].setFrequencia((float)idf*aux[i].getFrequencia());
+            for (int i = 0; i < aux.length; i++) {
+                aux[i].setFrequencia((float) idf * aux[i].getFrequencia());
             }
 
             //adiciona aux ao resultado
             //se resultado estiver vazio, copiar elementos, se nao, testar se ja existem para somar freqs
-            if(resultado.size()==0){
-                for(int i=0; i<aux.length; i++){
+            if (resultado.size() == 0) {
+                for (int i = 0; i < aux.length; i++) {
                     resultado.add(aux[i]);
                 }
-                
-            }else{
-                for(int i=0; i<aux.length; i++){
+
+            } else {
+                for (int i = 0; i < aux.length; i++) {
                     //indexOf() retorna posicao do id em resultado, se nao houver, retorna -1
                     int termo_pos = ElementoListaListPos(resultado, aux[i]);
 
                     //se id nao estiver na lista, adiciona, se estiver, soma as freqs
-                    if(termo_pos>-1){
+                    if (termo_pos > -1) {
                         resultado.get(termo_pos).setFrequencia(
-                        resultado.get(termo_pos).getFrequencia() + aux[i].getFrequencia()
+                                resultado.get(termo_pos).getFrequencia() + aux[i].getFrequencia()
                         );
-                    }else{
+                    } else {
                         resultado.add(aux[i]);
                     }
 
                 }
-                
+
             }
 
         }
@@ -230,11 +216,11 @@ public class ArquivoAtor extends Arquivo<Ator> {
         return resultado;
     }
 
-    public int ElementoListaListPos(List<ElementoLista> list, ElementoLista ele){
-        int i=0;
+    public int ElementoListaListPos(List<ElementoLista> list, ElementoLista ele) {
+        int i = 0;
         int res = -1;
-        while(i<list.size() && res==-1){
-            if(ele.getId() == list.get(i).getId()){
+        while (i < list.size() && res == -1) {
+            if (ele.getId() == list.get(i).getId()) {
                 res = i;
             }
             i++;
@@ -299,7 +285,7 @@ public class ArquivoAtor extends Arquivo<Ator> {
         return lista_de_atores;
     }
 
-    public void printMap(Map<String, Double> map){
+    public void printMap(Map<String, Double> map) {
         for (Map.Entry<String, Double> entry : map.entrySet()) {
             String key = entry.getKey();
             Double value = entry.getValue();
@@ -311,5 +297,5 @@ public class ArquivoAtor extends Arquivo<Ator> {
     public HashExtensivel<ParPalavraAtorIDFreq> getIndiceInverso() {
         return indiceInversoAtor;
     }
-    */
+     */
 }
