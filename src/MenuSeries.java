@@ -1,12 +1,13 @@
 
-import java.util.*;
 import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MenuSeries {
 
     ArquivoSerie arqSeries;
     ArquivoEpisodio arqEpisodios;
-    ArquivoAtor arqAtor;
+    ArquivoAtor arqAtor; 
 
     private static Scanner scan = new Scanner(System.in);
 
@@ -85,12 +86,12 @@ public class MenuSeries {
         String nome = scan.nextLine();
         System.out.println("\nTemporada: ");
         int temporada = scan.nextInt();
-        scan.nextLine();
+        scan.nextLine();  
         Episodio ep;
 
         if (nome != null) {
             try {
-                List<Episodio> series = arqEpisodios.readSerie(nome);  // Chama o método de leitura da classe Arquivo
+                ArrayList<Episodio> series = arqEpisodios.readSerie(nome);  // Chama o método de leitura da classe Arquivo
                 if (series != null) {
                     for (int i = 0; i < series.size(); i++) {
                         ep = series.get(i);
@@ -118,7 +119,7 @@ public class MenuSeries {
 
         if (nome != null) {
             try {
-                List<Episodio> series = arqEpisodios.readSerie(nome);  // Chama o método de leitura da classe Arquivo
+                ArrayList<Episodio> series = arqEpisodios.readSerie(nome);  // Chama o método de leitura da classe Arquivo
                 if (series != null) {
                     for (int i = 0; i < series.size(); i++) {
                         ep = series.get(i);
@@ -140,19 +141,23 @@ public class MenuSeries {
 
     public void buscarSerie() {
         System.out.print("\nnome da Serie: ");
-        String nome = scan.nextLine();
-        try {
-            List<Serie> resultados = arqSeries.searchTfIdf(nome);
-            if (resultados.isEmpty()) {
-                System.out.println("Serie não encontrada.");
-            } else {
-                for (Serie s : resultados) {
-                    mostraSerie(s);
+        String nome = scan.nextLine();  // Lê o ID digitado pelo usuário
+        // Limpar o buffer após o nextInt()
+
+        if (nome != null) {
+            try {
+                Serie serie = arqSeries.read(nome);  // Chama o método de leitura da classe Arquivo
+                if (serie != null) {
+                    mostraSerie(serie);  // Exibe os detalhes do serie encontrado
+                } else {
+                    System.out.println("Serie não encontrada.");
                 }
+            } catch (Exception e) {
+                System.out.println("Erro do sistema. Não foi possível buscar VELHO a serie!");
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            System.out.println("Erro ao buscar séries!");
-            e.printStackTrace();
+        } else {
+            System.out.println("ID inválido.");
         }
     }
 
@@ -284,7 +289,7 @@ public class MenuSeries {
                     char resp = scan.next().charAt(0);
                     if (resp == 'S' || resp == 's') {
                         // Salva as alterações no arquivo
-                        boolean alterado = arqSeries.update(serie);
+                        boolean alterado = arqSeries.update(serie, nome);
 
                         if (alterado) {
 
@@ -326,10 +331,10 @@ public class MenuSeries {
                         char resp = scan.next().charAt(0);  // Lê a resposta do usuário
 
                         if (resp == 'S' || resp == 's') {
-                            List<Ator> list_ator = arqAtor.readAtores(serie.nome);
+                            ArrayList<Ator> list_ator = arqAtor.readAtores(serie.nome);
 
                             //excluir todos os vinculos da serie
-                            for (Ator i : list_ator) {
+                            for(Ator i:list_ator){
                                 arqAtor.unlinkAtorSerie(i.getID(), serie.getID());
                             }
 
@@ -356,21 +361,21 @@ public class MenuSeries {
         }
     }
 
-    public void vinculoSerie() {
+    public void vinculoSerie(){
         System.out.print("\nNome da Serie: ");
         String nome = scan.nextLine();  // Lê o ID digitado pelo usuário
         // Limpar o buffer após o nextInt()
 
         if (nome != null) {
             try {
-
-                List<Ator> lista_de_atores = arqAtor.readAtores(nome);
-                if (lista_de_atores == null) {
+                
+                ArrayList<Ator> lista_de_atores = arqAtor.readAtores(nome);
+                if(lista_de_atores==null ){
                     System.out.println("Serie não encontrada.");
-                } else if (lista_de_atores.isEmpty()) {
+                } else if(lista_de_atores.isEmpty()){
                     System.out.println("Nenhum ator encontrado.");
-                } else {
-                    for (Ator i : lista_de_atores) {
+                }else{
+                    for(Ator i:lista_de_atores){
                         MenuAtor.mostrarAtor(i);
                     }
                 }
@@ -382,39 +387,52 @@ public class MenuSeries {
             System.out.println("Nome null.");
         }
     }
-
-    public void vincularAtores() {
+    
+    public void vincularAtores(){
         System.out.print("\nNome da Serie: ");
-        String nome_ator = "";
+        String nome_ator="";
         String nome = scan.nextLine();  // Lê o ID digitado pelo usuário
+        Ator ator=null;
 
         if (nome != null) {
             try {
 
                 Serie serie = arqSeries.read(nome);
 
-                if (serie != null && serie.getID() > -1) {
-                    while (!nome_ator.equals("0")) {
+                if(serie!=null && serie.getID()>-1){
+                    while(!nome_ator.equals("0")){
                         System.out.print("\nPara terminar as insercoes, digite 0 e pressione enter\n ");
-
+                        
                         System.out.print("\nNome do ator: ");
                         nome_ator = scan.nextLine().trim();
-                        if (!nome_ator.equals("0")) {
-                            Ator ator = arqAtor.readNome(nome_ator);
-                            if (ator != null && ator.getID() > -1) {
-                                if (arqAtor.linkAtorSerie(ator.getID(), serie.getID())) {
+                        if(!nome_ator.equals("0")){
+                            List<Ator> atores = arqAtor.readNome(nome);
+                
+                            if (atores != null && atores.size()!=0) {
+                                System.out.println("Digite o numero do ator que deseja: ");
+                                int i=1;
+                                for(Ator ator_b : atores){
+                                    System.out.print(i+ " - ");
+                                    //mostraSerie(ator_b);  // Exibe os detalhes do ator encontrado
+                                }
+                                int ator_id = scan.nextInt();
+                                scan.nextLine();
+                                ator = arqAtor.read(atores.get(ator_id).getID());
+                            }
+                            if(ator!=null && ator.getID()>-1){
+                                if(arqAtor.linkAtorSerie(ator.getID(), serie.getID())){
                                     System.out.println("Vinculo criado com sucesso");
-                                } else {
+                                }else{
                                     System.out.println("Criacao de vinculo falhou");
                                 }
-                            } else {
+                            }else{
                                 System.out.println("Ator nao encontrado.");
                             }
-                        } else {
+                        }else{
                             System.out.println("insercao encerrada");
                         }
                     }
-                } else {
+                }else{
                     System.out.println("Serie não encontrada.");
                 }
             } catch (Exception e) {
@@ -426,38 +444,52 @@ public class MenuSeries {
         }
     }
 
-    public void desvincularAtores() {
+    public void desvincularAtores(){
         System.out.print("\nNome da Serie: ");
-        String nome_ator = "";
+        String nome_ator="";
         String nome = scan.nextLine();  // Lê o ID digitado pelo usuário
+        Ator ator=null;
 
         if (nome != null) {
             try {
 
                 Serie serie = arqSeries.read(nome);
 
-                if (serie != null && serie.getID() > -1) {
-                    while (!nome_ator.equals("0")) {
+                if(serie!=null && serie.getID()>-1){
+                    while(!nome_ator.equals("0")){
                         System.out.print("\nPara terminar, digite 0 e pressione enter\n ");
-
+                        
                         System.out.print("\nNome do ator: ");
                         nome_ator = scan.nextLine().trim();
-                        if (!nome_ator.equals("0")) {
-                            Ator ator = arqAtor.readNome(nome_ator);
-                            if (ator != null && ator.getID() > -1) {
-                                if (arqAtor.unlinkAtorSerie(ator.getID(), serie.getID())) {
+                        if(!nome_ator.equals("0")){
+                            List<Ator> atores = arqAtor.readNome(nome);
+                
+                            if (atores != null && atores.size()!=0) {
+                                System.out.println("Digite o numero do ator que deseja: ");
+                                int i=1;
+                                for(Ator ator_b : atores){
+                                    System.out.print(i+ " - ");
+                                    //mostraSerie(ator_b);  // Exibe os detalhes do ator encontrado
+                                }
+                                int ator_id = scan.nextInt();
+                                scan.nextLine();
+                                ator = arqAtor.read(atores.get(ator_id).getID());
+                            }
+
+                            if(ator!=null && ator.getID()>-1){
+                                if(arqAtor.unlinkAtorSerie(ator.getID(), serie.getID())){
                                     System.out.println("Vinculo excluido com sucesso");
-                                } else {
+                                }else{
                                     System.out.println("Exclusao de vinculo falhou");
                                 }
-                            } else {
+                            }else{
                                 System.out.println("Ator nao encontrado.");
                             }
-                        } else {
+                        }else{
                             System.out.println("Exclusao de vinculos encerrada");
                         }
                     }
-                } else {
+                }else{
                     System.out.println("Serie não encontrada.");
                 }
             } catch (Exception e) {
@@ -472,7 +504,7 @@ public class MenuSeries {
     public boolean hasEpisodios(String nome) throws Exception {
         boolean res = true;
 
-        List<Episodio> lista = arqEpisodios.readSerie(nome);
+        ArrayList<Episodio> lista = arqEpisodios.readSerie(nome);
 
         if (lista == null) {
             res = false;

@@ -1,6 +1,7 @@
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import aed3.ElementoLista;
 
 public class MenuAtor {
 
@@ -62,7 +63,6 @@ public class MenuAtor {
         } while (opcao != 0);
     }
 
-    /* // ANTIGO
     public void buscarAtor() {
         System.out.print("\nnome do Ator: ");
         String nome = scan.nextLine();  // Lê o ID digitado pelo usuário
@@ -70,9 +70,19 @@ public class MenuAtor {
 
         if (nome != null) {
             try {
-                Ator ator = arqAtor.readNome(nome);  // Chama o método de leitura da classe Arquivo
-                if (ator != null) {
-                    mostrarAtor(ator);  // Exibe os detalhes do ator encontrado
+                List<Ator> atores = arqAtor.readNome(nome);
+                if (atores != null && atores.size()!=0) {
+                    System.out.println("Digite o numero do ator que deseja: ");
+                    int i=1;
+                    for(Ator ator : atores){
+                        System.out.print("\n"+i+ " - "+ator.nome);
+                        i++;  // Exibe os detalhes do ator encontrado
+                    }
+                    System.out.println("");
+                    int ator_id = scan.nextInt();
+                    scan.nextLine();
+                    mostrarAtor(arqAtor.read(atores.get(ator_id-1).getID()));
+
                 } else {
                     System.out.println("Ator não encontrado.");
                 }
@@ -82,23 +92,6 @@ public class MenuAtor {
             }
         } else {
             System.out.println("Nome não encontrado.");
-        }
-    }*/
-    public void buscarAtor() {
-        System.out.print("\nDigite termo de busca: ");
-        String termo = scan.nextLine();
-        try {
-            List<Ator> resultados = arqAtor.searchTfIdf(termo);
-            if (resultados.isEmpty()) {
-                System.out.println("Ator não encontrado.");
-            } else {
-                for (Ator a : resultados) {
-                    mostrarAtor(a);
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("Erro ao buscar atores!");
-            e.printStackTrace();
         }
     }
 
@@ -139,15 +132,24 @@ public class MenuAtor {
 
         System.out.print("\nDigite o Nome do ator a ser alterado: ");
         String nome = scan.nextLine();
-        Ator ator;
+        Ator ator = null;;
 
         if (nome != null) {
             try {
                 // Tenta ler o serie com o ID fornecido
-                ator = arqAtor.readNome(nome);
-                if (ator != null) {
-                    System.out.println("Ator encontrado:");
-                    mostrarAtor(ator);  // Exibe os dados do serie para confirmação
+                List<Ator> atores = arqAtor.readNome(nome);
+                
+                if (atores != null && atores.size()!=0) {
+                    System.out.println("Digite o numero do ator que deseja: ");
+                    int i=1;
+                    for(Ator ator_b : atores){
+                        System.out.print("\n"+i+ " - "+ator_b.nome);
+                        i++;
+                    }
+                    System.out.println("");
+                    int ator_id = scan.nextInt();
+                    scan.nextLine();
+                    ator = arqAtor.read(atores.get(ator_id-1).getID());
 
                     // Alteração de Nome
                     System.out.print("\nNovo nome (deixe em branco para manter o anterior): ");
@@ -156,9 +158,11 @@ public class MenuAtor {
                         ator.nome = novoNome;  // Atualiza o nome se fornecido
                     }
 
+                    // Confirmação da alteração
                     System.out.print("\nConfirma as alterações? (S/N) ");
                     char resp = scan.next().charAt(0);
                     if (resp == 'S' || resp == 's') {
+                        // Salva as alterações no arquivo
                         boolean alterado = arqAtor.update(ator);
 
                         if (alterado) {
@@ -185,12 +189,22 @@ public class MenuAtor {
     public void excluirAtor() {
         System.out.print("\nDigite o nome do ator a ser excluído: ");
         String nome = scan.nextLine();
+        Ator ator;
         if (nome != null) {
             try {
-                Ator ator = arqAtor.readNome(nome);
-                if (ator != null) {
-                    System.out.println("Ator encontrado:");
-                    mostrarAtor(ator);  // Exibe os dados do ator para confirmação
+                List<Ator> atores = arqAtor.readNome(nome);
+                
+                if (atores != null && atores.size()!=0) {
+                    System.out.println("Digite o numero do ator que deseja: ");
+                    int i=1;
+                    for(Ator ator_b : atores){
+                        System.out.print("\n"+i+ " - "+ator_b.nome);
+                        i++;
+                    }
+                    System.out.println("");
+                    int ator_id = scan.nextInt();
+                    scan.nextLine();
+                    ator = arqAtor.read(atores.get(ator_id-1).getID());
 
                     if (hasSeries(ator.nome)) {
                         System.out.print("\nAtor possui series associadas.\nPara excluir ator, exclua todos os vinculos dela a series");
@@ -199,7 +213,7 @@ public class MenuAtor {
                         char resp = scan.next().charAt(0);  // Lê a resposta do usuário
 
                         if (resp == 'S' || resp == 's') {
-                            boolean excluido = arqAtor.delete(nome);  // Chama o método de exclusão no arquivo
+                            boolean excluido = arqAtor.delete(ator.id);  // Chama o método de exclusão no arquivo
                             if (excluido) {
                                 System.out.println("Ator excluído com sucesso.");
                             } else {

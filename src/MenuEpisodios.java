@@ -1,7 +1,7 @@
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Scanner;
 
 public class MenuEpisodios {
 
@@ -60,20 +60,23 @@ public class MenuEpisodios {
     }
 
     public void buscarEpisodio() {
-        System.out.print("\nDigite termo de busca: ");
-        String termo = scan.nextLine();
-        try {
-            List<Episodio> resultados = arqEpisodios.searchTfIdf(termo);
-            if (resultados.isEmpty()) {
-                System.out.println("Episodio não encontrado.");
-            } else {
-                for (Episodio ep : resultados) {
-                    mostraEpisodio(ep);
+        System.out.print("\nNome do episodio: ");
+        String nome = scan.nextLine();  // Lê o ID digitado pelo usuário
+
+        if (nome != null) {
+            try {
+                Episodio episodio = arqEpisodios.readNome(nome);  // Chama o método de leitura da classe Arquivo
+                if (episodio != null) {
+                    mostraEpisodio(episodio);  // Exibe os detalhes do episodio encontrado
+                } else {
+                    System.out.println("Episodio não encontrado.");
                 }
+            } catch (Exception e) {
+                System.out.println("Erro do sistema. Não foi possível buscar o episodio!");
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            System.out.println("Erro ao buscar episódios!");
-            e.printStackTrace();
+        } else {
+            System.out.println("ID inválido.");
         }
     }
 
@@ -228,7 +231,7 @@ public class MenuEpisodios {
                     if (resp == 'S' || resp == 's') {
 
                         // Salva as alterações no arquivo
-                        boolean alterado = arqEpisodios.update(episodio);
+                        boolean alterado = arqEpisodios.update(episodio, nome);
 
                         if (alterado) {
 

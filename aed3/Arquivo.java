@@ -37,24 +37,6 @@ public class Arquivo<T extends EntidadeArquivo> {
                 "./dados/" + nomeEntidade + "/indiceDireito.c.db");
     }
 
-    public int count() throws Exception { // METODO PARA CONTAR -- TESTANDO 
-        int total = 0;
-        int id = 0;
-        while (true) {
-            T obj;
-            try {
-                obj = this.read(id);
-            } catch (EOFException eof) {
-                break;
-            }
-            if (obj != null) {
-                total++;
-            }
-            id++;
-        }
-        return total;
-    }
-
     public int create(T entidade) throws Exception {
         // Obtem o ID da nova entidade
         arquivo.seek(1);
@@ -244,8 +226,8 @@ public class Arquivo<T extends EntidadeArquivo> {
             proximo = arquivo.readLong();
             if (lapide == '*' && tamanho >= tamanhoNecessario) {
                 if (anterior == 5) {
-                    arquivo.seek(anterior);
-                } else {
+                    arquivo.seek(anterior); 
+                }else {
                     arquivo.seek(anterior + 3);
                 }
                 arquivo.writeLong(proximo);

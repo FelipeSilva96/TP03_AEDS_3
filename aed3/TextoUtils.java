@@ -24,11 +24,26 @@ public class TextoUtils {
     }
 
     /** Retorna mapa palavra→frequência no texto */
-    public static Map<String,Integer> termFrequencies(String texto) {
-        Map<String,Integer> freqs = new HashMap<>();
-        for (String w : tokenize(texto)) {
-            freqs.put(w, freqs.getOrDefault(w, 0) + 1);
+    public static Map<String, Double> termFrequencies(String texto) {
+        Map<String,Double> freqs = new HashMap<>();
+        List<String> tokens = tokenize(texto);
+        Double reg_freq = (double) (1.0/tokens.size());
+        for (String w : tokens) {
+            if(freqs.get(w)==null){
+                freqs.put(w, reg_freq);
+            }else{
+                freqs.put(w, freqs.get(w)+reg_freq);
+            }
+            
         }
         return freqs;
+    }
+
+    public void printMap(Map<String, Double> map){
+        for (Map.Entry<String, Double> entry : map.entrySet()) {
+            String key = entry.getKey();
+            Double value = entry.getValue();
+            System.out.println(key + " ; " + value);
+        }
     }
 }

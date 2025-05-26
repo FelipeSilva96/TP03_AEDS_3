@@ -8,7 +8,7 @@ public class ElementoLista implements Comparable<ElementoLista>, Cloneable {
     public ElementoLista(int i, float f) {
         this.id = i;
         this.frequencia = f;
-    }
+    } 
 
     public int getId() {
         return id;
@@ -40,6 +40,13 @@ public class ElementoLista implements Comparable<ElementoLista>, Cloneable {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public boolean equals(ElementoLista obj) {
+        if(this.getId()==obj.getId()){
+            return true;
+        }
+        return false;
     }
 
     @Override
